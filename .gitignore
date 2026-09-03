@@ -1,0 +1,18 @@
+# Build files
+build/
+cmake-build-*/
+
+# Executables
+*.exe
+*.out
+
+# Object files
+*.o
+*.obj
+
+# VS Code
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db
