@@ -11,5 +11,5 @@ include_directories(include)
 
 add_executable(UniversityManagementSystem
     main.cpp
-    
+    src/TimeSlot.cpp
 )
