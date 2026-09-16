@@ -13,4 +13,5 @@ add_executable(UniversityManagementSystem
     main.cpp
     src/TimeSlot.cpp
     src/Person.cpp
+    src/Timetable.cpp
 )
