@@ -28,6 +28,24 @@ The UML diagram indicates `ostream&` as the return type for `operator==`; this w
 
 ***CHANGE***
 
+### Person
+
+- Made the Person constructor protected.
+
+- Added const qualifiers to read-only member functions such as login(), getName(), and getId().
+
+- Added a virtual destructor.
+
+***REASON***
+
+The constructor was made protected because Person is an abstract base class and should only be constructed through derived classes.
+
+The const qualifiers ensure that read-only functions cannot modify the object.
+
+The virtual destructor ensures proper destruction of derived objects through a Person base-class pointer.
+
+
+3.
 ### Course - TimeSlot
 
 - Changed the `Course` class `timeslot` attribute from `list<Timetable>` to `list<TimeSlot>`.
