@@ -281,3 +281,19 @@ REASON
 
 Course is an abstract class and cannot be stored or passed by value in C++. Using pointers and references preserves polymorphism and allows LectureCourse, LabCourse, and ProjectCourse objects to be handled correctly.
 
+10.
+
+DATE
+
+2026-09-15
+
+CHANGE
+
+Administrator
+Changed createCourse() and editCourse() lecturer parameters from Lecturer to Lecturer&.
+Added const references for string and prerequisite-list parameters to avoid unnecessary copying.
+Added ~Administrator() override = default.
+
+REASON
+
+Lecturer& allows the existing lecturer object to be referenced without creating an unnecessary copy. const references avoid copying input strings and prerequisite lists while preventing modification of the supplied arguments. The virtual default destructor safely overrides the Person destructor.

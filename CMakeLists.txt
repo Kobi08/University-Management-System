@@ -22,4 +22,5 @@ add_executable(UniversityManagementSystem
     src/ProjectCourse.cpp
     src/Student.cpp
     src/Lecturer.cpp
+    src/Administrator.cpp
 )
