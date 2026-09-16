@@ -20,4 +20,7 @@ add_executable(UniversityManagementSystem
     src/LectureCourse.cpp
     src/LabCourse.cpp
     src/ProjectCourse.cpp
+    src/Student.cpp
+    src/Lecturer.cpp
+    src/Administrator.cpp
 )

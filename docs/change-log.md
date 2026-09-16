@@ -229,3 +229,95 @@ Validation was added to prevent grade calculation when the submission score has 
 Using the submission score directly as the ProjectCourse grade is a project-defined implementation assumption because the project specification does not provide a specific ProjectCourse grading formula.
 
 These changes will be reflected in the final UML diagram and final project report.
+
+8.
+
+***DATE***
+
+## 2026-09-16
+
+***CHANGE***
+
+### Student
+
+- Added a constructor that was not specified in the UML.
+- Used `Course&` / `const Course&` for Course parameters instead of passing Course objects by value.
+- Used `showMenu()` instead of the UML `showmenu()` to override the existing `Person::showMenu()`.
+- Kept enrolment-related functionality pending until the `Enrolment` class is implemented.
+
+**REASON**
+
+The constructor was added to initialize the inherited `Person` data and the Student's `Timetable`.
+
+References were used for Course parameters because `Course` is an abstract class and cannot be passed by value.
+
+`showMenu()` was used because the existing `Person` class defines `showMenu()` as the pure virtual function that must be overridden.
+
+The enrolment-related functions depend on the `Enrolment` class for enrolment and course-completion information.
+
+9.
+
+***DATE***
+
+## 2026-09-16
+
+***CHANGE***
+
+### Lecturer
+
+- Added a constructor that was not specified in the UML.
+- Represented `assignedcourse : list<Course>` as `list<Course*>`.
+- Used `showMenu()` instead of the UML `showmenu()` to override the existing `Person::showMenu()`.
+- Used `Course&` for the `viewenrolment()` parameter.
+- Used `const TimeSlot&` for the `openattendancesession()` parameter.
+- Kept the actual attendance-session logic pending until the attendance functionality is implemented.
+
+**REASON**
+
+The constructor was added to initialize the inherited `Person` data and the Lecturer's course list.
+
+`list<Course*>` was used to store references to existing Course objects.
+
+`showMenu()` was used because the existing `Person` class defines `showMenu()` as the pure virtual function that must be overridden.
+
+A reference was used because `Course` is an abstract class and cannot be passed by value.
+
+A const reference was used for `TimeSlot` because the function only needs to read the provided TimeSlot.
+
+The `viewenrolment()` logic depends on the existing `Course::viewenrolment()` function to access the course's enrolment records.
+
+The actual attendance-session logic depends on the attendance-related classes being implemented.
+
+10.
+
+***DATE***
+
+## 2026-09-16
+
+***CHANGE***
+
+### Administrator
+
+- Added a constructor that was not specified in the UML.
+- Used `showMenu()` instead of the UML `showmenu()` to override the existing `Person::showMenu()`.
+- Used `bool` return types for `removeuser()`, `createcourse()`, and `removecourse()`, although return types were not specified in the UML.
+- Used references and const references for parameters where required by the C++ implementation.
+- Kept user-management operations pending until the user-management and storage functionality is implemented.
+- Kept course-management operations pending until the course-management and storage functionality is implemented.
+- Kept `generateenrolmentreport()` pending until the `Enrolment` class and enrolment data are available.
+
+**REASON**
+
+The constructor was added to initialize the inherited `Person` data.
+
+`showMenu()` was used because the existing `Person` class defines `showMenu()` as the pure virtual function that must be overridden.
+
+`bool` was used where a success or failure result can be returned when the actual management logic is integrated.
+
+References and const references were used to represent the parameters appropriately in C++.
+
+The user-management functions depend on the user-management and storage components.
+
+The course-management functions depend on the Course and storage components.
+
+The enrolment report depends on the `Enrolment` class and its stored enrolment data.
