@@ -8,6 +8,7 @@ using namespace std;
 
 class Enrolment;
 class Lecturer;
+class AssessmentMarks;
 
 class Course {
 private:
@@ -16,27 +17,27 @@ private:
     int credit;
     int capacity;
 
-    list<Enrolment*> enrolledstudentdetails;
+    list<Enrolment*> enroledstudentdetails;
 
     list<string> prerequisites;
 
-    Lecturer* assignedlecturer;
+    Lecturer* asignlecturer;
 
-    list<TimeSlot> timeslots;
+    list<TimeSlot> timeslot;
 
 public:
     Course(const string& code, const string& title, int credit, int capacity,
-           Lecturer& assignedlecturer,
+           Lecturer& asignlecturer,
            const list<string>& prerequisites = {});
 
     virtual ~Course() = default;
 
-    virtual double calculateGrade() const = 0;
+    virtual double calculategrade(const AssessmentMarks& marks) const = 0;
 
-    bool isFull() const;
-    bool hasPrerequisites(const string& code) const;
-    list<Enrolment*> viewEnrolment() const;
-    string getCode() const;
+    bool isfull() const;
+    bool hasPrerequistes(const string& code) const;
+    list<Enrolment*> viewenrolment() const;
+    string getcode() const;
 
     void addTimeSlot(const TimeSlot& slot);
     list<TimeSlot> getTimeSlots() const;

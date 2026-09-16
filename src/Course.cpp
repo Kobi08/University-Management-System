@@ -1,21 +1,21 @@
 #include "Course.h"
 
 Course::Course(const string& code, const string& title, int credit, int capacity,
-               Lecturer& assignedlecturer, const list<string>& prerequisites)
+               Lecturer& asignlecturer, const list<string>& prerequisites)
     : code(code),
       title(title),
       credit(credit),
       capacity(capacity),
-      enrolledstudentdetails(),
+      enroledstudentdetails(),
       prerequisites(prerequisites),
-      assignedlecturer(&assignedlecturer),
-      timeslots() {}
+      asignlecturer(&asignlecturer),
+      timeslot() {}
 
-bool Course::isFull() const {
-    return static_cast<int>(enrolledstudentdetails.size()) >= capacity;
+bool Course::isfull() const {
+    return static_cast<int>(enroledstudentdetails.size()) >= capacity;
 }
 
-bool Course::hasPrerequisites(const string& code) const {
+bool Course::hasPrerequistes(const string& code) const {
     for (const string& prerequisite : prerequisites) {
         if (prerequisite == code) {
             return true;
@@ -24,20 +24,20 @@ bool Course::hasPrerequisites(const string& code) const {
     return false;
 }
 
-list<Enrolment*> Course::viewEnrolment() const {
-    return enrolledstudentdetails;
+list<Enrolment*> Course::viewenrolment() const {
+    return enroledstudentdetails;
 }
 
-string Course::getCode() const {
+string Course::getcode() const {
     return code;
 }
 
 void Course::addTimeSlot(const TimeSlot& slot) {
-    timeslots.push_back(slot);
+    timeslot.push_back(slot);
 }
 
 list<TimeSlot> Course::getTimeSlots() const {
-    return timeslots;
+    return timeslot;
 }
 
 ostream& operator<<(ostream& os, const Course& c) {
@@ -45,7 +45,7 @@ ostream& operator<<(ostream& os, const Course& c) {
        << ", Title: " << c.title
        << ", Credit: " << c.credit
        << ", Capacity: " << c.capacity
-       << ", Enrolled: " << c.enrolledstudentdetails.size()
+       << ", Enrolled: " << c.enroledstudentdetails.size()
        << "]";
 
     return os;
