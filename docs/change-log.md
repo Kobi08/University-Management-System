@@ -229,3 +229,71 @@ Validation was added to prevent grade calculation when the submission score has 
 Using the submission score directly as the ProjectCourse grade is a project-defined implementation assumption because the project specification does not provide a specific ProjectCourse grading formula.
 
 These changes will be reflected in the final UML diagram and final project report.
+
+
+
+8. 
+***DATE*******
+
+## 2026-09-15
+
+***CHANGE*******
+
+### Student
+
+Changed enrollCourse(Course c) to enrollCourse(Course& course).
+
+Changed dropCourse(Course c) to dropCourse(Course& course).
+
+Changed isEnrolled(Course c) to isEnrolled(const Course& course) const.
+
+Added const qualifiers to hasCompleted() and viewTimetable().
+
+Added ~Student() override = default.
+
+***REASON*******
+
+Course is an abstract class, so it cannot be passed by value without object slicing and compilation issues. Using references preserves polymorphism.
+
+const qualifiers ensure read-only member functions cannot modify the Student object.
+
+The virtual default destructor explicitly overrides the Person virtual destructor and follows the inheritance hierarchy safely.
+
+9.
+
+DATE
+
+2026-09-15
+
+CHANGE
+
+Lecturer
+
+Changed assignedCourse from list<Course> to list<Course*>.
+
+Changed viewEnrolment(Course) to viewEnrolment(Course& course).
+
+Changed openAttendance(Course) to openAttendance(Course& course).
+
+Added const qualifier to viewEnrolment().
+
+REASON
+
+Course is an abstract class and cannot be stored or passed by value in C++. Using pointers and references preserves polymorphism and allows LectureCourse, LabCourse, and ProjectCourse objects to be handled correctly.
+
+10.
+
+DATE
+
+2026-09-15
+
+CHANGE
+
+Administrator
+Changed createCourse() and editCourse() lecturer parameters from Lecturer to Lecturer&.
+Added const references for string and prerequisite-list parameters to avoid unnecessary copying.
+Added ~Administrator() override = default.
+
+REASON
+
+Lecturer& allows the existing lecturer object to be referenced without creating an unnecessary copy. const references avoid copying input strings and prerequisite lists while preventing modification of the supplied arguments. The virtual default destructor safely overrides the Person destructor.

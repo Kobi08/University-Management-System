@@ -3,13 +3,17 @@
 #include "Course.h"
 #include "AssessmentMarks.h"
 #include "LabCourse.h"
+#include "LectureCourse.h"
 #include "Person.h"
 #include "ProjectCourse.h"
 #include "Timetable.h"
+#include "Lecturer.h"
+#include "Student.h"
+#include "Administrator.h"
 using namespace std;
 
 int main(){
-
+      //Testing for Time slot
     //cout<<"University Management System PROJECT 1";
 
     //TimeSlot slot1("Monday",9,11,"Lab A");
@@ -27,6 +31,27 @@ int main(){
       //       <<(slot1==slot3)<<endl;
 
 
+// Lecturer l("Dr. Silva", "lect123");
+
+// cout << l << endl;
+
+// l.showMenu();
+
+// cout << l.login("lect123") << endl;
+
+
+
+    // Administrator admin("Admin", "admin123");
+
+    // cout << admin << endl;
+
+    // admin.showMenu();
+
+    // cout << "\nLogin test: "
+    //      << admin.login("admin123")
+    //      << endl;
+
+    // admin.logout();
 
     
 
