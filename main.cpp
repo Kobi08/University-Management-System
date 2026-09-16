@@ -3,9 +3,12 @@
 #include "Course.h"
 #include "AssessmentMarks.h"
 #include "LabCourse.h"
+#include "LectureCourse.h"
 #include "Person.h"
 #include "ProjectCourse.h"
 #include "Timetable.h"
+#include "Lecturer.h"
+#include "Student.h"
 using namespace std;
 
 int main(){
@@ -27,7 +30,13 @@ int main(){
       //       <<(slot1==slot3)<<endl;
 
 
+Lecturer l("Dr. Silva", "lect123");
 
+cout << l << endl;
+
+l.showMenu();
+
+cout << l.login("lect123") << endl;
     
 
     return 0;
