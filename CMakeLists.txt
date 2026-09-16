@@ -15,7 +15,6 @@ add_executable(UniversityManagementSystem
     src/TimeSlot.cpp
     src/Person.cpp
     src/Timetable.cpp
-)
     src/Course.cpp
     src/AssessmentMarks.cpp
     src/LectureCourse.cpp
