@@ -11,7 +11,14 @@ include_directories(include)
 
 add_executable(UniversityManagementSystem
     main.cpp
+
     src/TimeSlot.cpp
     src/Person.cpp
     src/Timetable.cpp
+)
+    src/Course.cpp
+    src/AssessmentMarks.cpp
+    src/LectureCourse.cpp
+    src/LabCourse.cpp
+    src/ProjectCourse.cpp
 )
