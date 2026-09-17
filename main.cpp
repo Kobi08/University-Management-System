@@ -17,6 +17,9 @@
 #include "Attendancerecord.h"
 #include "Attendanceregister.h"
 #include "Correctionrecord.h"
+#include "SessionclosedException.h"
+#include "NotenrolException.h"
+#include "DuplicateattendanceException.h"
 using namespace std;
 
 int main(){
@@ -69,15 +72,42 @@ int main(){
 
 //     cout << student << endl;
 
-FileReplayCapture replay("attendance.txt");
+// FileReplayCapture replay("attendance.txt");
 
-replay.beginSession();
+// replay.beginSession();
 
-cout << replay.captureNext() << endl;
-cout << replay.captureNext() << endl;
-cout << replay.captureNext() << endl;
+// cout << replay.captureNext() << endl;
+// cout << replay.captureNext() << endl;
+// cout << replay.captureNext() << endl;
 
-replay.endSession();
+// replay.endSession();
+
+ try
+    {
+        throw SessionclosedException();
+    }
+    catch (const Exception& e)
+    {
+        cout << e.what() << endl;
+    }
+
+    try
+    {
+        throw NotenrolException();
+    }
+    catch (const Exception& e)
+    {
+        cout << e.what() << endl;
+    }
+
+    try
+    {
+        throw DuplicateattendanceException();
+    }
+    catch (const Exception& e)
+    {
+        cout << e.what() << endl;
+    }
 
     return 0;
 }

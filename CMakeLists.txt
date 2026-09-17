@@ -29,4 +29,8 @@ add_executable(UniversityManagementSystem
     src/Attendancerecord.cpp
     src/Attendanceregister.cpp
     src/Correctionrecord.cpp
+    src/Exception.cpp
+    src/DuplicateattendanceException.cpp
+    src/NotenrolException.cpp
+    src/SessionclosedException.cpp
 )

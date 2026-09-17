@@ -403,3 +403,20 @@ Changed object parameters to reference parameters where copying is unnecessary o
 REASON
 
 Passing domain objects by reference avoids unnecessary copies and allows AttendanceSession to be passed without violating its non-copyable design.
+
+17.
+
+DATE
+
+2026-09-16
+
+CHANGE
+
+Exception hierarchy
+Added a message attribute to the Exception base class.
+Added constructors to Exception, SessionclosedException, NotenrolException, and DuplicateattendanceException.
+Added what() override to Exception.
+
+REASON
+
+The UML defines the exception hierarchy but does not specify message storage or constructors. The implementation requires meaningful exception messages so that each attendance rule violation can be communicated to the user, as required by FR7.2.
