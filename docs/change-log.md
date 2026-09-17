@@ -297,3 +297,17 @@ Added ~Administrator() override = default.
 REASON
 
 Lecturer& allows the existing lecturer object to be referenced without creating an unnecessary copy. const references avoid copying input strings and prerequisite lists while preventing modification of the supplied arguments. The virtual default destructor safely overrides the Person destructor.
+
+DATE
+
+2026-09-17
+
+CHANGE
+
+RotatingCodeCapture Added string filePath and ifstream inputFile. Added the constructor that initializes filePath. Implemented beginSession(), captureNext(), and endSession().
+
+REASON
+
+string filePath stores the location of the attendance source, while ifstream inputFile provides the C++ mechanism for reading attendance identifiers from the source. The constructor initializes the file path used by the capture object.
+
+beginSession() checks whether the attendance file exists before opening it and throws a runtime_error if the file is unavailable or cannot be opened. captureNext() reads and returns the next person's attendance identifier from the input file, returning an empty string when there are no more identifiers. endSession() closes the input file when the attendance session is over.
