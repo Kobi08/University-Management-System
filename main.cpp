@@ -15,6 +15,8 @@
 #include "Attendancecapture.h"
 #include "Filereplaycapture.h"
 #include "Attendancerecord.h"
+#include "Attendanceregister.h"
+#include "Correctionrecord.h"
 using namespace std;
 
 int main(){

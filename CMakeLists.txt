@@ -27,4 +27,6 @@ add_executable(UniversityManagementSystem
     src/AttendanceSession.cpp
     src/Filereplaycapture.cpp
     src/Attendancerecord.cpp
+    src/Attendanceregister.cpp
+    src/Correctionrecord.cpp
 )
