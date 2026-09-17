@@ -21,24 +21,16 @@
 #include "NotenrolException.h"
 #include "DuplicateattendanceException.h"
 #include "Rotatingcodecapture.h"
+#include "Repository.h"
 using namespace std;
 
 int main(){ 
-    cout << "===== RotatingCodeCapture Test =====\n\n";
+    Repository<Student> studentRepo("students.txt");
 
-    RotatingCodeCapture capture;
+    Student student("Kamal", "1234");
 
-    // Test 1: Start the session
-    capture.beginSession();
+    studentRepo.add(student);
 
-    // Test 2: Enter a code
-    string enteredCode = capture.captureNext();
-
-    cout << "\nYou entered: " << enteredCode << endl;
-
-    // Test 3: End the session
-    capture.endSession();
-
-    cout << "\nSession ended successfully.\n";
+    cout << "Student added successfully!" << endl;
     return 0;
 }
