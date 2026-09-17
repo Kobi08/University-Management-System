@@ -420,3 +420,22 @@ Added what() override to Exception.
 REASON
 
 The UML defines the exception hierarchy but does not specify message storage or constructors. The implementation requires meaningful exception messages so that each attendance rule violation can be communicated to the user, as required by FR7.2.
+
+DATE
+
+2026-09-16
+
+CHANGE
+
+RotatingCodeCapture
+
+Removed file-handling members (filePath and ifstream).
+
+Replaced file-reading logic with rotating session code generation and user code capture.
+
+Added a currentCode member to maintain the active session code.
+
+REASON
+
+RotatingCodeCapture represents the group's chosen live attendance mechanism (Rotating Session Code), whereas file handling belongs to FileReplayCapture. A currentCode member is required to maintain the active session code during an attendance session while keeping the implementation aligned with the intended mechanism. 
+C02203_OOP_PROJECT_GRP_NO_25 (1).pdf

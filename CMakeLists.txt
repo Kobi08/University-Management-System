@@ -33,4 +33,5 @@ add_executable(UniversityManagementSystem
     src/DuplicateattendanceException.cpp
     src/NotenrolException.cpp
     src/SessionclosedException.cpp
+    src/Rotatingcodecapture.cpp
 )

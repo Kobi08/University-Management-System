@@ -20,17 +20,25 @@
 #include "SessionclosedException.h"
 #include "NotenrolException.h"
 #include "DuplicateattendanceException.h"
+#include "Rotatingcodecapture.h"
 using namespace std;
 
 int main(){ 
-    Student student("Kobi", "1234");
-  
+    cout << "===== RotatingCodeCapture Test =====\n\n";
 
+    RotatingCodeCapture capture;
 
-// AttendanceRegister attendanceRegister;
+    // Test 1: Start the session
+    capture.beginSession();
 
-// attendanceRegister.markPresent(student, session);
+    // Test 2: Enter a code
+    string enteredCode = capture.captureNext();
 
-// cout << "Attendance marked successfully!" << endl;
+    cout << "\nYou entered: " << enteredCode << endl;
+
+    // Test 3: End the session
+    capture.endSession();
+
+    cout << "\nSession ended successfully.\n";
     return 0;
 }
