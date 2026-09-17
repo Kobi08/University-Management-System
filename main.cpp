@@ -15,48 +15,15 @@
 #include "RotatingCodeCapture.h"
 using namespace std;
 
-int main(){
-      //Testing for Time slot
-    //cout<<"University Management System PROJECT 1";
-
-    //TimeSlot slot1("Monday",9,11,"Lab A");
-    //TimeSlot slot2("Monday",10,12,"LT-3");
-    //TimeSlot slot3("Tuesday",9,11,"Lab B");
-
-    //cout<<"Slot 1: "<<slot1<<std::endl;
-    //cout<<"Slot 2: "<<slot2<<std::endl;
-    //cout<<"Slot 3: "<<slot3<<std::endl;
-
-    //cout<<"\nSlot1 clashes Slot2: "
-      //       <<(slot1==slot2)<<endl;
-
-    //cout<<"Slot1 clashes Slot3: "
-      //       <<(slot1==slot3)<<endl;
+int main(){ 
+    Student student("Kobi", "1234");
+  
 
 
-// Lecturer l("Dr. Silva", "lect123");
+// AttendanceRegister attendanceRegister;
 
-// cout << l << endl;
+// attendanceRegister.markPresent(student, session);
 
-// l.showMenu();
-
-// cout << l.login("lect123") << endl;
-
-
-
-    // Administrator admin("Admin", "admin123");
-
-    // cout << admin << endl;
-
-    // admin.showMenu();
-
-    // cout << "\nLogin test: "
-    //      << admin.login("admin123")
-    //      << endl;
-
-    // admin.logout();
-
-    
-
+// cout << "Attendance marked successfully!" << endl;
     return 0;
 }

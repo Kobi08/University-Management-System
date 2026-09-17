@@ -313,3 +313,124 @@ REASON
 string filePath stores the location of the attendance source, while ifstream inputFile provides the C++ mechanism for reading attendance identifiers from the source. The constructor initializes the file path used by the capture object.
 
 beginSession() checks whether the attendance file exists before opening it and throws a runtime_error if the file is unavailable or cannot be opened. captureNext() reads and returns the next person's attendance identifier from the input file, returning an empty string when there are no more identifiers. endSession() closes the input file when the attendance session is over.
+DATE
+
+2026-09-16
+
+CHANGE
+
+Enrolment
+Changed student : Student to Student* student.
+Changed course : Course to Course* course.
+Changed dateEnrolled : date to string dateEnrolled.
+
+REASON
+
+Student* and Course* allow the Enrolment object to reference the existing Student and Course objects without creating copies, while preserving their relationships and avoiding unnecessary object duplication. date was represented using string because C++ does not provide a simple built-in date type matching the UML representation; a consistent date format can be stored as text.
+
+12.
+DATE
+
+2026-09-16
+
+CHANGE
+
+AttendanceSession
+
+Changed course : Course to Course* course.
+
+Added a const qualifier to isExpired().
+
+REASON
+
+Course is an abstract class and cannot be stored by value in C++. Using a pointer preserves polymorphism and allows LectureCourse, LabCourse, and ProjectCourse objects to be referenced correctly. The const qualifier ensures isExpired() does not modify the AttendanceSession object.
+
+13.
+
+DATE
+
+2026-09-16
+
+CHANGE
+
+Represented the replay source using std::string filePath and std::ifstream.
+
+REASON
+
+std::ifstream is the standard C++ mechanism for reading attendance IDs from a text file while keeping the file-handling responsibility inside FileReplayCapture.
+
+14.
+DATE
+
+2026-09-16
+
+CHANGE
+
+AttendanceRecord
+Changed student : Student to Student* student.
+Changed session : AttendanceSession to AttendanceSession* session.
+Represented the UML time attribute using C++ time_t.
+
+REASON
+
+Pointers allow the attendance record to reference the existing Student and AttendanceSession objects without creating copies. time_t provides the C++ representation required for storing the attendance timestamp.
+
+15.
+DATE
+
+2026-09-16
+
+CHANGE
+
+AttendanceRegister
+Changed UML value parameters Student, AttendanceSession, Course, AttendanceRecord, and Lecturer to reference parameters where object copying is unnecessary or incompatible with the existing class design.
+
+REASON
+
+Passing these domain objects by reference avoids unnecessary object copies. In particular, AttendanceSession has copy assignment explicitly deleted and therefore should not be passed by value.
+
+16.
+DATE
+
+2026-09-16
+
+CHANGE
+
+CorrectionRecord
+Added a constructor to initialize originalrecord, actinglec­turer, reason, and timestamp.
+Represented the UML time attribute using C++ time_t.
+
+REASON
+
+The UML does not define a constructor, but a constructor is required to initialize a correction record while keeping its attributes private and preventing later modification through setters. time_t is used as the C++ representation for the timestamp.
+
+16.
+DATE
+
+2026-09-16
+
+CHANGE
+
+AttendanceRegister
+Changed object parameters to reference parameters where copying is unnecessary or incompatible with the existing class design.
+
+REASON
+
+Passing domain objects by reference avoids unnecessary copies and allows AttendanceSession to be passed without violating its non-copyable design.
+
+17.
+
+DATE
+
+2026-09-16
+
+CHANGE
+
+Exception hierarchy
+Added a message attribute to the Exception base class.
+Added constructors to Exception, SessionclosedException, NotenrolException, and DuplicateattendanceException.
+Added what() override to Exception.
+
+REASON
+
+The UML defines the exception hierarchy but does not specify message storage or constructors. The implementation requires meaningful exception messages so that each attendance rule violation can be communicated to the user, as required by FR7.2.
