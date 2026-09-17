@@ -34,4 +34,5 @@ add_executable(UniversityManagementSystem
     src/NotenrolException.cpp
     src/SessionclosedException.cpp
     src/Rotatingcodecapture.cpp
+    src/Menu.cpp
 )
