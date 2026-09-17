@@ -10,6 +10,11 @@
 #include "Lecturer.h"
 #include "Student.h"
 #include "Administrator.h"
+#include "Enrolment.h"
+#include "AttendanceSession.h"
+#include "Attendancecapture.h"
+#include "Filereplaycapture.h"
+#include "Attendancerecord.h"
 using namespace std;
 
 int main(){
@@ -53,7 +58,24 @@ int main(){
 
     // admin.logout();
 
-    
+  
+
+//     // You'll need to construct a Course according
+//     // to your existing Course hierarchy.
+
+//     Student student("Kobi", "1234");
+
+//     cout << student << endl;
+
+FileReplayCapture replay("attendance.txt");
+
+replay.beginSession();
+
+cout << replay.captureNext() << endl;
+cout << replay.captureNext() << endl;
+cout << replay.captureNext() << endl;
+
+replay.endSession();
 
     return 0;
 }

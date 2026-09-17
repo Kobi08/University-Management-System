@@ -23,4 +23,8 @@ add_executable(UniversityManagementSystem
     src/Student.cpp
     src/Lecturer.cpp
     src/Administrator.cpp
+    src/Enrolment.cpp
+    src/AttendanceSession.cpp
+    src/Filereplaycapture.cpp
+    src/Attendancerecord.cpp
 )
