@@ -18,6 +18,10 @@ private:
 public:
     Student(const string& name, const string& password);
 
+    Student(const string& name,
+        const string& password,
+        const string& id);
+
     void showMenu() override;
 
     void enrollCourse(Course& course);

@@ -19,6 +19,10 @@ protected:
     Person(const string& name,
            const string& password);
 
+        Person(const string& name,
+           const string& password,
+           const string& id);
+
 public:
     bool login(const string& enteredPassword) const;
     void logout();

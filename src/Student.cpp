@@ -6,6 +6,14 @@ using namespace std;
 Student::Student(const string& name, const string& password)
     : Person(name, password), timetable() {}
 
+Student::Student(const string& name,
+                 const string& password,
+                 const string& id)
+    : Person(name, password, id),
+      timetable()
+{
+}
+
 void Student::showMenu()
 {
     cout << "\n===== Student Menu (" << getName() << ") =====\n";
