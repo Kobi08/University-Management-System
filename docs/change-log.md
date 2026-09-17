@@ -297,3 +297,66 @@ Added ~Administrator() override = default.
 REASON
 
 Lecturer& allows the existing lecturer object to be referenced without creating an unnecessary copy. const references avoid copying input strings and prerequisite lists while preventing modification of the supplied arguments. The virtual default destructor safely overrides the Person destructor.
+
+11.
+DATE
+
+2026-09-16
+
+CHANGE
+
+Enrolment
+Changed student : Student to Student* student.
+Changed course : Course to Course* course.
+Changed dateEnrolled : date to string dateEnrolled.
+
+REASON
+
+Student* and Course* allow the Enrolment object to reference the existing Student and Course objects without creating copies, while preserving their relationships and avoiding unnecessary object duplication. date was represented using string because C++ does not provide a simple built-in date type matching the UML representation; a consistent date format can be stored as text.
+
+12.
+DATE
+
+2026-09-16
+
+CHANGE
+
+AttendanceSession
+
+Changed course : Course to Course* course.
+
+Added a const qualifier to isExpired().
+
+REASON
+
+Course is an abstract class and cannot be stored by value in C++. Using a pointer preserves polymorphism and allows LectureCourse, LabCourse, and ProjectCourse objects to be referenced correctly. The const qualifier ensures isExpired() does not modify the AttendanceSession object.
+
+13.
+
+DATE
+
+2026-09-16
+
+CHANGE
+
+Represented the replay source using std::string filePath and std::ifstream.
+
+REASON
+
+std::ifstream is the standard C++ mechanism for reading attendance IDs from a text file while keeping the file-handling responsibility inside FileReplayCapture.
+
+14.
+DATE
+
+2026-09-16
+
+CHANGE
+
+AttendanceRecord
+Changed student : Student to Student* student.
+Changed session : AttendanceSession to AttendanceSession* session.
+Represented the UML time attribute using C++ time_t.
+
+REASON
+
+Pointers allow the attendance record to reference the existing Student and AttendanceSession objects without creating copies. time_t provides the C++ representation required for storing the attendance timestamp.
