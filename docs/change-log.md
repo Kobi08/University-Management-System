@@ -360,3 +360,63 @@ Represented the UML time attribute using C++ time_t.
 REASON
 
 Pointers allow the attendance record to reference the existing Student and AttendanceSession objects without creating copies. time_t provides the C++ representation required for storing the attendance timestamp.
+
+15.
+DATE
+
+2026-09-16
+
+CHANGE
+
+AttendanceRegister
+Changed UML value parameters Student, AttendanceSession, Course, AttendanceRecord, and Lecturer to reference parameters where object copying is unnecessary or incompatible with the existing class design.
+
+REASON
+
+Passing these domain objects by reference avoids unnecessary object copies. In particular, AttendanceSession has copy assignment explicitly deleted and therefore should not be passed by value.
+
+16.
+DATE
+
+2026-09-16
+
+CHANGE
+
+CorrectionRecord
+Added a constructor to initialize originalrecord, actinglec­turer, reason, and timestamp.
+Represented the UML time attribute using C++ time_t.
+
+REASON
+
+The UML does not define a constructor, but a constructor is required to initialize a correction record while keeping its attributes private and preventing later modification through setters. time_t is used as the C++ representation for the timestamp.
+
+16.
+DATE
+
+2026-09-16
+
+CHANGE
+
+AttendanceRegister
+Changed object parameters to reference parameters where copying is unnecessary or incompatible with the existing class design.
+
+REASON
+
+Passing domain objects by reference avoids unnecessary copies and allows AttendanceSession to be passed without violating its non-copyable design.
+
+17.
+
+DATE
+
+2026-09-16
+
+CHANGE
+
+Exception hierarchy
+Added a message attribute to the Exception base class.
+Added constructors to Exception, SessionclosedException, NotenrolException, and DuplicateattendanceException.
+Added what() override to Exception.
+
+REASON
+
+The UML defines the exception hierarchy but does not specify message storage or constructors. The implementation requires meaningful exception messages so that each attendance rule violation can be communicated to the user, as required by FR7.2.
