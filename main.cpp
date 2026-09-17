@@ -10,6 +10,9 @@
 #include "Lecturer.h"
 #include "Student.h"
 #include "Administrator.h"
+#include "AttendanceCapture.h"
+#include "FileReplayCapture.h"
+#include "RotatingCodeCapture.h"
 using namespace std;
 
 int main(){

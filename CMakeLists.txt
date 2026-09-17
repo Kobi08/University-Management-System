@@ -23,4 +23,6 @@ add_executable(UniversityManagementSystem
     src/Student.cpp
     src/Lecturer.cpp
     src/Administrator.cpp
+    src/RotatingCodeCapture.cpp
+    src/FileReplayCapture.cpp
 )
