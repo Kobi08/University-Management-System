@@ -7,6 +7,7 @@
 
 class Course;
 class AttendanceCapture;
+class AttendanceRegister;
 
 class AttendanceSession
 {
@@ -35,6 +36,8 @@ public:
     AttendanceSession(AttendanceSession&& other) noexcept;
 
     AttendanceSession& operator=(AttendanceSession&& other) noexcept;
+
+    friend class AttendanceRegister;
 
     ~AttendanceSession();
 };

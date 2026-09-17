@@ -2,6 +2,7 @@
 #define ATTENDANCEREGISTER_H
 
 #include <list>
+#include <string>
 
 #include "AttendanceRecord.h"
 #include "CorrectionRecord.h"
@@ -24,8 +25,8 @@ public:
                      AttendanceSession& session);
 
     void addCorrections(AttendanceRecord& rec,
-                         const string& reason,
-                         Lecturer& lecturer);
+                        const string& reason,
+                        Lecturer& lecturer);
 
     double getStudentPercentage(Student& student,
                                 Course& course) const;

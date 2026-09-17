@@ -28,6 +28,8 @@ public:
 
     friend ostream& operator<<(ostream& os,
                                const AttendanceRecord& r);
+
+                               friend class AttendanceRegister;
 };
 
 #endif
