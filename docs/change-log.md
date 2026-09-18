@@ -46,6 +46,22 @@
 - Added an AttendanceRecord constructor.
   - Reason: the UML does not specify a constructor or setter methods, but the private record attributes need to be initialized so that AttendanceRegister can create usable attendance records.
 
+  ### CorrectionRecord – UML Deviations
+
+- Changed `originalrecord : AttendanceRecord` to `AttendanceRecord* originalrecord`.
+  - Reason: the correction record should refer to the existing AttendanceRecord rather than create a separate copy.
+
+- Changed `actinglecuturer : Lecturer` to `Lecturer* actinglecuturer`.
+  - Reason: the correction record should refer to the existing Lecturer rather than create a separate Lecturer object.
+
+- Changed `timestamp : time` to `time_t timestamp`.
+  - Reason: `time` is not a standard usable C++ data type; `time_t` is used to store the time value.
+
+- Added a constructor to initialize the private attributes.
+  - Reason: the UML does not specify a constructor or setter methods, so a constructor is required to create a usable CorrectionRecord.
+
+- 
+
 
 
 
