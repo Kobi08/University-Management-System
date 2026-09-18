@@ -4,22 +4,22 @@
 #include <string>
 #include <ctime>
 
-using namespace std;
+#include "AttendanceRecord.h"
+#include "Lecturer.h"
 
-class AttendanceRecord;
-class Lecturer;
+using namespace std;
 
 class CorrectionRecord
 {
 private:
-    AttendanceRecord* originalrecord;
-    Lecturer* actinglecuturer;
+    AttendanceRecord originalrecord;
+    Lecturer actinglecuturer;
     string reason;
     time_t timestamp;
 
 public:
-    CorrectionRecord(AttendanceRecord* originalrecord,
-                     Lecturer* actinglecuturer,
+    CorrectionRecord(AttendanceRecord originalrecord,
+                     Lecturer actinglecuturer,
                      const string& reason,
                      time_t timestamp);
 };
