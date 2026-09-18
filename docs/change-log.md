@@ -68,7 +68,31 @@
   - Reason: `AttendanceRegister::addcorrections()` receives both the AttendanceRecord and Lecturer by value, and `Lecturer` is copyable in the existing Member 1 implementation.
   - Pointer members were considered but rejected because storing pointers to the by-value parameters would create dangling pointers after `addcorrections()` returns.
 
-- 
+- ### AttendanceRegister – UML Deviations
+
+- Changed `markpresent(Student student, AttendanceSession session)` to use
+  `Student&` and `AttendanceSession&`.
+  - Reason: AttendanceRecord stores pointers to the existing Student and
+    AttendanceSession objects. Passing them by value would create pointers
+    to temporary local copies that become invalid after `markpresent()`
+    returns.
+
+- Changed `getstudentpercentage(Student student, Course course)` to use
+  `Student&` and `Course&`, and changed `getcoursepercentage(Course course)`
+  to use `Course&`.
+  - Reason: the methods need to compare the supplied objects with the
+    existing Student and Course objects referenced by the attendance records.
+
+- Added `friend class AttendanceRegister` to AttendanceRecord and
+  AttendanceSession.
+  - Reason: AttendanceRegister needs access to the private record and course
+    relationship data required by the UML percentage methods.
+
+- Attendance percentage calculation is based on the AttendanceRecord objects
+  stored in the register.
+  - Reason: the UML does not provide a separate collection of attendance
+    sessions or a `markabsent()` operation.
+  - No additional attendance methods or attributes were added.
 
 
 
