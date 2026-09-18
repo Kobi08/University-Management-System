@@ -24,6 +24,13 @@
 - `durationminute` defaults to `0`.
   - Reason: the UML does not provide a constructor parameter or setter for configuring the duration.
 
+### RotatingCodeCapture – UML Deviation
+
+- Added the private attribute `currentCode : string`.
+  - The UML diagram does not explicitly show any attributes for `RotatingCodeCapture`.
+  - This attribute was added because the attendance-code capture mechanism needs to store the currently generated attendance code during an active session.
+  - No other attributes were added.
+
 
 
 
