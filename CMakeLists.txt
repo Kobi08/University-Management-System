@@ -19,4 +19,6 @@ add_executable(UniversityManagementSystem
     src/RotatingCodeCapture.cpp
     src/AttendanceRecord.cpp
     src/CorrectionRecord.cpp
+     src/AttendanceRegister.cpp
+      
 )
