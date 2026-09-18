@@ -9,6 +9,7 @@ using namespace std;
 
 class Student;
 class AttendanceSession;
+class AttendanceRegister;
 
 class AttendanceRecord
 {
@@ -25,6 +26,8 @@ public:
                      const string& status,
                      time_t timestamp,
                      const string& capturedby);
+
+    friend class AttendanceRegister;
 
     friend ostream& operator<<(ostream& os,
                                const AttendanceRecord& record);
