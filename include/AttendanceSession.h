@@ -9,6 +9,7 @@
 using namespace std;
 
 class AttendanceCapture;
+class AttendanceRegister;
 
 class AttendanceSession
 {
@@ -36,6 +37,8 @@ public:
     AttendanceSession& operator=(AttendanceSession&& other);
 
     ~AttendanceSession();
+
+    friend class AttendanceRegister;
 };
 
 #endif
