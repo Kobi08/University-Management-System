@@ -16,5 +16,5 @@ add_executable(UniversityManagementSystem
     src/TimeSlot.cpp
     src/Timetable.cpp
     src/AttendanceSession.cpp
-
+    src/RotatingCodeCapture.cpp
 )
