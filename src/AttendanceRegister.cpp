@@ -2,8 +2,8 @@
 
 using namespace std;
 
-void AttendanceRegister::markpresent(Student student,
-                                     AttendanceSession session)
+void AttendanceRegister::markpresent(Student& student,
+                                     AttendanceSession& session)
 {
     AttendanceRecord record(
         &student,
@@ -30,8 +30,8 @@ void AttendanceRegister::addcorrections(AttendanceRecord rec,
     corrections.push_back(correction);
 }
 
-double AttendanceRegister::getstudentpercentage(Student student,
-                                                Course course)
+double AttendanceRegister::getstudentpercentage(Student& student,
+                                                Course& course)
 {
     int totalRecords = 0;
     int presentRecords = 0;
@@ -70,7 +70,7 @@ double AttendanceRegister::getstudentpercentage(Student student,
             static_cast<double>(totalRecords)) * 100.0;
 }
 
-double AttendanceRegister::getcoursepercentage(Course course)
+double AttendanceRegister::getcoursepercentage(Course& course)
 {
     int totalRecords = 0;
     int presentRecords = 0;

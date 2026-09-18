@@ -20,17 +20,17 @@ private:
     list<CorrectionRecord> corrections;
 
 public:
-    void markpresent(Student student,
-                     AttendanceSession session);
+    void markpresent(Student& student,
+                     AttendanceSession& session);
 
     void addcorrections(AttendanceRecord rec,
                         string reason,
                         Lecturer lecturer);
 
-    double getstudentpercentage(Student student,
-                                Course course);
+    double getstudentpercentage(Student& student,
+                                Course& course);
 
-    double getcoursepercentage(Course course);
+    double getcoursepercentage(Course& course);
 };
 
 #endif
