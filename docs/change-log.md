@@ -55,7 +55,6 @@
 - Added `friend class AttendanceRegister`.
   - Reason: AttendanceRegister needs to access the private AttendanceRecord data when calculating student and course attendance percentages, without adding extra public methods that are not specified in the UML.
 
-
 ### CorrectionRecord – UML Deviations
 
 - Changed `timestamp : time` from the UML to `time_t timestamp`.
@@ -64,36 +63,28 @@
 - Added a constructor to initialize the private attributes.
   - Reason: the UML does not specify a constructor or setter methods, so a constructor is required to create a usable CorrectionRecord.
 
-- Kept `originalrecord : AttendanceRecord` and `actinglecuturer : Lecturer` as value members according to the UML.
-  - Reason: `AttendanceRegister::addcorrections()` receives both the AttendanceRecord and Lecturer by value, and `Lecturer` is copyable in the existing Member 1 implementation.
-  - Pointer members were considered but rejected because storing pointers to the by-value parameters would create dangling pointers after `addcorrections()` returns.
+- Kept `originalrecord : AttendanceRecord` and `actinglecuturer : Lecturer`
+  as value members according to the UML.
+  - Reason: the existing UML specifies these attributes as AttendanceRecord
+    and Lecturer, and the existing Lecturer class is copyable.
 
-- ### AttendanceRegister – UML Deviations
+-### AttendanceRegister – UML Deviations
 
 - Changed `markpresent(Student student, AttendanceSession session)` to use
   `Student&` and `AttendanceSession&`.
   - Reason: AttendanceRecord stores pointers to the existing Student and
     AttendanceSession objects. Passing them by value would create pointers
-    to temporary local copies that become invalid after `markpresent()`
-    returns.
+    to local copies that become invalid after the function returns.
 
-- Changed `getstudentpercentage(Student student, Course course)` to use
-  `Student&` and `Course&`, and changed `getcoursepercentage(Course course)`
-  to use `Course&`.
-  - Reason: the methods need to compare the supplied objects with the
-    existing Student and Course objects referenced by the attendance records.
+- Changed the percentage method parameters to references.
+  - Reason: the methods need to identify the existing Student and Course
+    objects referenced by the attendance records.
 
 - Added `friend class AttendanceRegister` to AttendanceRecord and
   AttendanceSession.
-  - Reason: AttendanceRegister needs access to the private record and course
-    relationship data required by the UML percentage methods.
+  - Reason: AttendanceRegister requires access to the private data needed
+    to perform the UML-specified attendance calculations.
 
-- Attendance percentage calculation is based on the AttendanceRecord objects
-  stored in the register.
-  - Reason: the UML does not provide a separate collection of attendance
-    sessions or a `markabsent()` operation.
-  - No additional attendance methods or attributes were added.
-
-
+- No additional public methods or attributes were added.
 
 
