@@ -184,7 +184,6 @@ Pointer members were considered but not retained because `AttendanceRegister::ad
 - Implemented `addcorrections()`.
 - Implemented `getstudentpercentage()`.
 - Implemented `getcoursepercentage()`.
-- Added `friend class AttendanceRegister` to the classes that require private-data access for the percentage calculations.
 
 ### Reason
 
