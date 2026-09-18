@@ -32,6 +32,19 @@
   - No other attributes were added.
 
 
+### AttendanceRecord – UML Deviations
+
+- Changed `timestamp : time` from the UML to `time_t timestamp`.
+  - Reason: `time` is not a standard usable C++ data type; `time_t` is the appropriate C++ type for storing a time value.
+
+- Represented `student : Student` as `Student* student`.
+  - Reason: the existing Student class does not have a default constructor, and AttendanceRecord needs to refer to an existing Student rather than create a new Student object.
+
+- Represented `session : AttendanceSession` as `AttendanceSession* session`.
+  - Reason: AttendanceRecord needs to refer to an existing AttendanceSession rather than create or copy a separate session object.
+
+- Added an AttendanceRecord constructor.
+  - Reason: the UML does not specify a constructor or setter methods, but the private record attributes need to be initialized so that AttendanceRegister can create usable attendance records.
 
 
 
