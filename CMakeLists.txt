@@ -10,6 +10,17 @@ add_compile_options(-Wall)
 include_directories(include)
 
 add_executable(UniversityManagementSystem
-    main.cpp
+      main.cpp
+    src/Person.cpp
+    src/Student.cpp
+    src/Lecturer.cpp
+    src/Administrator.cpp
+    src/Course.cpp
+    src/LectureCourse.cpp
+    src/LabCourse.cpp
+    src/ProjectCourse.cpp
+    src/AssessmentMarks.cpp
+    src/Enrolment.cpp
     
+
 )
