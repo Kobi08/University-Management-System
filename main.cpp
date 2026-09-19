@@ -10,6 +10,7 @@
 #include "AssessmentMarks.h"
 #include "Enrolment.h"
 #include "Exceptions.h"
+#include "AttendanceRegister.h"
 
 using namespace std;
 
@@ -265,6 +266,10 @@ student.enrollCourse(testCourse);
 
 cout << "Enrolment List Size After Student Enrolment: "
      << testCourse.viewEnrolment().size() << endl;
+student.dropCourse(testCourse);
+
+cout << "Enrolment List Size After Student Drop: "
+     << testCourse.viewEnrolment().size() << endl;     
 
      cout << "\n===== ENROLMENT GETTER TEST =====\n";
 
@@ -277,6 +282,86 @@ cout << "Enrolment Student ID: "
      << enrolledStudent->getId() << endl;
      cout << "\nEnrolment Course: "
      << lectureEnrolment.getCourse()->getCode() << endl;
+
+cout << "\n===== ATTENDANCE TEST =====\n";
+
+TimeSlot lectureSlot(
+    "Monday",
+    9,
+    11,
+    "LT-3"
+);
+
+lectureCourse.addTimeSlot(lectureSlot);
+
+lecturer.addCourse(lectureCourse);
+
+Enrolment attendanceEnrolment(
+    student,
+    lectureCourse,
+    "Enrolled",
+    "2026-09-19",
+    0
+);
+
+lectureCourse.addEnrolment(attendanceEnrolment);
+Student otherStudent("Other Student", "other123");
+lecturer.openAttendanceSession(lectureSlot, 60);
+
+AttendanceRegister attendanceRegister;
+
+attendanceRegister.markpresent(
+    student,
+    *lecturer.getActiveSession()
+);
+
+cout << "Attendance marked successfully." << endl;
+try
+{
+    attendanceRegister.markpresent(
+        student,
+        *lecturer.getActiveSession()
+    );
+}
+catch (const DuplicateAttendanceException& e)
+{
+    cout << "DuplicateAttendanceException caught: "
+         << e.what() << endl;
+}
+try
+{
+    attendanceRegister.markpresent(
+        otherStudent,
+        *lecturer.getActiveSession()
+    );
+}
+catch (const NotEnrolledException& e)
+{
+    cout << "NotEnrolledException caught: "
+         << e.what() << endl;
+}
+
+lecturer.closeAttendanceSession();
+AttendanceSession closedSession(
+    lectureCourse,
+    lectureSlot,
+    60
+);
+
+try
+{
+    attendanceRegister.markpresent(
+        student,
+        closedSession
+    );
+}
+catch (const SessionClosedException& e)
+{
+    cout << "SessionClosedException caught: "
+         << e.what() << endl;
+}
 return 0;
+
+
    
 }

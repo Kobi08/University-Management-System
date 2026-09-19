@@ -560,3 +560,136 @@ The reference changes prevent pointers stored by `AttendanceRecord` from referri
 ### UML / Code Deviations
 
 1. Updated the build configuration only; no UML class, attribute, relationship, or domain method was changed.
+
+## 2026-09-19
+
+### Member 1 ↔ Member 2 Integration
+
+#### Exception Hierarchy
+
+- Added `NotEnrolledException`.
+- Added `DuplicateAttendanceException`.
+- Added `SessionClosedException`.
+
+These exceptions extend the existing `Exception` base class and provide the required attendance-related exception types for `AttendanceRegister` validation.
+
+#### AttendanceSession Integration
+
+- Added a parameterized `AttendanceSession` constructor accepting:
+  - `Course&`
+  - `TimeSlot`
+  - `durationminute`
+- Added `isOpen() const`.
+- Added `getCourse() const`.
+- Added `getTimeSlot() const`.
+- Added `getDurationMinute() const`.
+
+These changes allow the Lecturer and AttendanceRegister components to create and inspect an attendance session using the existing Course, TimeSlot, duration, and session-state information.
+
+### Reason
+
+The existing `AttendanceSession` already contained the required UML attributes:
+
+- `course`
+- `timeslot`
+- `opentime`
+- `isopen`
+- `durationminute`
+- `capture`
+
+However, the required integration could not access or initialise these values through the public interface.
+
+The new constructor and read-only accessors expose the existing session information without adding new domain attributes or changing the existing Course–TimeSlot–AttendanceSession relationships.
+
+### UML / Code Deviations
+
+1. Added a parameterized constructor to initialise the existing UML-defined `AttendanceSession` attributes.
+2. Added public read-only accessors for existing UML-defined attributes.
+3. No new data members or new UML relationships were introduced.
+
+These changes are necessary to allow `Lecturer`, `AttendanceRegister`, and the attendance workflow to interact with the existing `AttendanceSession` model while preserving the intended UML structure.
+
+
+## 2026-09-19
+
+### Member 1 ↔ Member 2 Integration — Attendance and Lecturer Integration
+
+#### Exception Hierarchy
+
+- Added `NotEnrolledException`.
+- Added `DuplicateAttendanceException`.
+- Added `SessionClosedException`.
+
+These exceptions extend the existing `Exception` base class and are used by `AttendanceRegister` to validate attendance operations.
+
+#### AttendanceSession Integration
+
+- Added a parameterized constructor:
+  `AttendanceSession(Course&, const TimeSlot&, int durationminute)`.
+- Added `isOpen() const`.
+- Added `getCourse() const`.
+- Added `getTimeSlot() const`.
+- Added `getDurationMinute() const`.
+
+These operations provide controlled access to the existing `AttendanceSession` attributes required for integration with `Lecturer` and `AttendanceRegister`.
+
+#### Course Integration
+
+- Added `getLecturer() const` to allow the Lecturer to verify whether a Course is assigned to that Lecturer.
+
+#### Lecturer Integration
+
+- Added `AttendanceSession* activeSession` to store the currently active attendance session.
+- Added `addCourse(Course&)` to maintain the Lecturer's assigned course list.
+- Changed `openAttendanceSession(const TimeSlot&)` to:
+  `openAttendanceSession(const TimeSlot&, int durationminute)`.
+- Added `getActiveSession() const` to provide access to the currently active session for attendance operations.
+- Implemented the connection between Lecturer, Course, TimeSlot, and AttendanceSession.
+- The Lecturer now checks that the supplied TimeSlot belongs to one of the Lecturer's assigned courses before opening an attendance session.
+
+#### AttendanceRegister Integration
+
+- Added a session-open validation using `SessionClosedException`.
+- Added student-enrolment validation using `NotEnrolledException`.
+- Added duplicate-attendance validation using `DuplicateAttendanceException`.
+- Attendance records are created only after all required validation checks succeed.
+- Included `Enrolment.h` in `AttendanceRegister.cpp` so the register can access the existing `Enrolment` interface when checking whether a Student is enrolled in the Course.
+
+### Reason
+
+These changes connect the existing Member 1 domain classes with the Member 2 attendance implementation.
+
+The existing UML already defines the relationships between Lecturer, Course, TimeSlot, AttendanceSession, Student, Enrolment, and AttendanceRegister. The additional implementation members and operations were added only where the existing public interfaces were insufficient to perform the required integration.
+
+The `AttendanceSession` constructor allows its existing UML-defined attributes to be initialised when a Lecturer opens a session.
+
+The `AttendanceSession` getter functions provide controlled read-only access to existing session information without exposing private attributes directly.
+
+`Course::getLecturer()` allows the Lecturer to verify ownership of a Course using the existing `asignlecturer` relationship.
+
+`Lecturer::addCourse()` maintains the Lecturer's course collection so that attendance sessions can be opened only for courses assigned to that Lecturer.
+
+`Lecturer::activeSession` is required because `closeAttendanceSession()` has no session parameter and therefore needs to retain the currently active session.
+
+The duration parameter was added to `openAttendanceSession()` so that the session duration can be supplied when an attendance session is created instead of using a fixed value.
+
+The attendance validation uses the existing Student, Course, and Enrolment relationships rather than introducing additional domain classes.
+
+### UML / Code Deviations
+
+1. Added `NotEnrolledException`.
+2. Added `DuplicateAttendanceException`.
+3. Added `SessionClosedException`.
+4. Added `AttendanceSession(Course&, const TimeSlot&, int durationminute)`.
+5. Added `AttendanceSession::isOpen() const`.
+6. Added `AttendanceSession::getCourse() const`.
+7. Added `AttendanceSession::getTimeSlot() const`.
+8. Added `AttendanceSession::getDurationMinute() const`.
+9. Added `Course::getLecturer() const`.
+10. Added `Lecturer::addCourse(Course&)`.
+11. Added `Lecturer::activeSession` as a private `AttendanceSession*`.
+12. Changed `Lecturer::openAttendanceSession(const TimeSlot&)` to `openAttendanceSession(const TimeSlot&, int durationminute)`.
+13. Added `Lecturer::getActiveSession() const`.
+
+These changes do not introduce new domain classes or replace the existing UML relationships. They provide the additional implementation interface required to connect the Member 1 domain model with the Member 2 attendance workflow.
+

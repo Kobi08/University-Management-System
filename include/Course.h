@@ -47,8 +47,10 @@ public:
 
 
    void addEnrolment(Enrolment& enrolment);
-
+   void removeEnrolment(Enrolment& enrolment);
     string getCode() const;
+
+    Lecturer* getLecturer() const;
 
     void addTimeSlot(const TimeSlot& slot);
 

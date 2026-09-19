@@ -33,6 +33,12 @@ void Student::enrollCourse(Course& course)
             "Cannot enrol: course is full."
         );
     }
+    if (isEnrolled(course))
+{
+    throw Exception(
+        "Cannot enrol: student is already enrolled in this course."
+    );
+}
 
     // TODO: Check prerequisite requirements.
     // Recursive prerequisite validation will be completed
@@ -46,15 +52,30 @@ void Student::enrollCourse(Course& course)
         );
     }
 
-    // TODO: Create and register the Enrolment using the
-    // final Enrolment/Repository integration.
+    Enrolment* enrolment = new Enrolment(
+    *this,
+    course,
+    "Enrolled",
+    "2026-09-19",
+    0
+);
+
+course.addEnrolment(*enrolment);
+timetable.addCourse(course);
 }
 
 void Student::dropCourse(Course& course)
 {
-    // TODO: Complete course-drop logic using the Enrolment class.
-    
-    timetable.removeCourse(course);
+    for (Enrolment* enrolment : course.viewEnrolment())
+    {
+        if (enrolment != nullptr &&
+            enrolment->getStudent() == this)
+        {
+            course.removeEnrolment(*enrolment);
+            timetable.removeCourse(course);
+            return;
+        }
+    }
 }
 
 bool Student::hasCompleted(const string& courseCode) const

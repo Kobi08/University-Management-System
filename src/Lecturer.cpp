@@ -1,4 +1,7 @@
 #include "Lecturer.h"
+#include "Course.h"
+#include "TimeSlot.h"
+#include "AttendanceSession.h"
 
 #include <iostream>
 
@@ -6,7 +9,8 @@ using namespace std;
 
 Lecturer::Lecturer(const string& name,
                    const string& password)
-    : Person(name, password)
+    : Person(name, password),
+      activeSession(nullptr)
 {
 }
 
@@ -29,16 +33,69 @@ void Lecturer::viewEnrolment(Course& course) const
     (void)course;
 }
 
-void Lecturer::openAttendanceSession(const TimeSlot& slot)
+void Lecturer::openAttendanceSession(const TimeSlot& slot,
+                                     int durationminute)
 {
-    // TODO: Connect to Member 2's AttendanceSession implementation.
-    // The session must be opened for one of the lecturer's own
-    // course time slots.
+    for (Course* course : assignedCourse)
+    {
+        if (course == nullptr)
+        {
+            continue;
+        }
 
-    (void)slot;
+        if (course->getLecturer() != this)
+        {
+            continue;
+        }
+
+        for (const TimeSlot& courseSlot : course->getTimeSlots())
+        {
+            if (courseSlot == slot)
+            {
+                if (activeSession != nullptr)
+                {
+                    activeSession->close();
+                    delete activeSession;
+                }
+
+                activeSession =
+                    new AttendanceSession(*course, slot, durationminute);
+
+                activeSession->open();
+
+                cout << "Attendance session opened for course "
+                     << course->getCode() << "." << endl;
+
+                return;
+            }
+        }
+    }
+
+    cout << "This time slot does not belong to one of your courses."
+         << endl;
 }
 
 void Lecturer::closeAttendanceSession()
 {
-    // TODO: Connect to Member 2's AttendanceSession implementation.
+    if (activeSession == nullptr)
+    {
+        cout << "No active attendance session." << endl;
+        return;
+    }
+
+    activeSession->close();
+
+    delete activeSession;
+    activeSession = nullptr;
+
+    cout << "Attendance session closed." << endl;
+}
+
+void Lecturer::addCourse(Course& course)
+{
+    assignedCourse.push_back(&course);
+}
+AttendanceSession* Lecturer::getActiveSession() const
+{
+    return activeSession;
 }
