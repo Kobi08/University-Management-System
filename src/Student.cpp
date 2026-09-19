@@ -9,8 +9,7 @@ using namespace std;
 
 Student::Student(const string& name,
                  const string& password)
-    : Person(name, password),
-      timetable(nullptr)
+    : Person(name, password)
 {
 }
 
@@ -40,18 +39,22 @@ void Student::enrollCourse(Course& course)
     // when the required student completion history and
     // prerequisite course information are available.
 
-    // TODO: Check timetable clashes using Member 2's final Timetable.
+    if (timetable.hasClash(course))
+    {
+        throw TimetableClashException(
+            "Cannot enrol: timetable clash detected."
+        );
+    }
 
     // TODO: Create and register the Enrolment using the
     // final Enrolment/Repository integration.
 }
+
 void Student::dropCourse(Course& course)
 {
     // TODO: Complete course-drop logic using the Enrolment class.
-    // TODO: Connect timetable removal using Member 2's
-    // final Timetable implementation.
-
-    (void)course;
+    
+    timetable.removeCourse(course);
 }
 
 bool Student::hasCompleted(const string& courseCode) const
@@ -65,17 +68,22 @@ bool Student::hasCompleted(const string& courseCode) const
 
 bool Student::isEnrolled(const Course& course) const
 {
-    // TODO: Check the student's Enrolment records once
-    // the Enrolment implementation is available.
+    for (Enrolment* enrolment : course.viewEnrolment())
+    {
+        if (enrolment != nullptr &&
+            enrolment->getStudent() == this &&
+            enrolment->getCourse() == &course)
+        {
+            return true;
+        }
+    }
 
-    (void)course;
     return false;
 }
 
 void Student::viewTimetable() const
 {
-    // TODO: Implement using Member 2's final Timetable
-    // implementation once it is available.
+    timetable.display();
 }
 
 ostream& operator<<(ostream& os, const Student& student)

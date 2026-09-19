@@ -7,6 +7,11 @@ void Timetable::addCourse(Course& course)
     courses.push_back(&course);
 }
 
+void Timetable::removeCourse(Course& course)
+{
+    courses.remove(&course);
+}
+
 void Timetable::display() const
 {
     for (Course* course : courses)

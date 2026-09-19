@@ -13,6 +13,11 @@ add_executable(UniversityManagementSystem
 
     main.cpp
 
+    src/Person.cpp
+    src/Student.cpp
+    src/Lecturer.cpp
+    src/Administrator.cpp
+    src/Course.cpp
     src/TimeSlot.cpp
     src/Timetable.cpp
     src/AttendanceSession.cpp
@@ -20,16 +25,9 @@ add_executable(UniversityManagementSystem
     src/AttendanceRecord.cpp
     src/CorrectionRecord.cpp
     src/AttendanceRegister.cpp
-    src/Person.cpp
-    src/Student.cpp
-    src/Lecturer.cpp
-    src/Administrator.cpp
-    src/Course.cpp
     src/LectureCourse.cpp
     src/LabCourse.cpp
     src/ProjectCourse.cpp
     src/AssessmentMarks.cpp
     src/Enrolment.cpp
-    
-
 )

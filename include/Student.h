@@ -5,17 +5,17 @@
 #include <string>
 
 #include "Person.h"
+#include "Timetable.h"
 
 using namespace std;
 
 class Course;
-class Timetable;
+
 
 class Student : public Person
 {
 private:
-    // TODO: Connect this pointer to Member 2's final Timetable implementation.
-    Timetable* timetable;
+    Timetable timetable;
 
 public:
     Student(const string& name,

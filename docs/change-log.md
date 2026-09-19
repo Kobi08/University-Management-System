@@ -368,18 +368,20 @@ These changes are limited to the implementation requirements and do not introduc
 
 - Implemented the UML `courses` relationship using `list<Course*>` instead of `list<Course>`.
 - Added `addCourse(Course&)`.
+- Added `removeCourse(Course&)`.
 - Implemented timetable display and course clash detection using the associated Course TimeSlots.
 
 ### Reason
 
 `Course` is an abstract class and cannot be stored by value. `Course*` allows the Timetable to refer to existing Course objects.
 
-The UML contains a private course collection but does not provide an operation for adding courses to the timetable. `addCourse()` is therefore required to populate the timetable and perform clash detection.
+The UML contains a private course collection but does not provide operations for adding or removing courses from the timetable. `addCourse()` and `removeCourse()` are therefore required to manage the timetable courses and perform clash detection.
 
 ### UML / Code Deviations
 
 1. `courses` changed from `list<Course>` to `list<Course*>`.
 2. Added `addCourse(Course&)`.
+3. Added `removeCourse(Course&)`.
 
 These changes preserve the intended Course-Timetable relationship while using a valid C++ representation for an abstract Course type.
 

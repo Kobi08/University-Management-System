@@ -16,6 +16,8 @@ private:
 public:
     void addCourse(Course& course);
 
+    void removeCourse(Course& course);
+
     void display() const;
 
     bool hasClash(const Course& c) const;
