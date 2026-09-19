@@ -587,3 +587,25 @@ The new methods provide the minimum public interface required to configure and i
 6. Added `gettimeslot() const` to access the associated TimeSlot.
 
 These additions are integration interfaces only. No existing UML attributes, relationships, or core session operations were removed or redesigned.
+
+## 2026-09-19
+
+### RotatingCodeCapture Integration
+
+- Updated `captureNext()` to validate the entered attendance code against the current active session code.
+- A matching code is returned to the caller.
+- An invalid code returns an empty string.
+
+### Reason
+
+The UML defines `captureNext()` as the operation used to capture attendance input, but does not define a separate public code-validation operation.
+
+Validation was therefore implemented inside `captureNext()` to keep the existing UML interface unchanged while allowing the attendance system to distinguish valid and invalid attendance codes.
+
+### UML / Code Deviations
+
+1. No new public validation method was added.
+2. `captureNext()` now validates the captured code against the private `currentCode`.
+3. Invalid input returns an empty string.
+
+The existing private `currentCode` attribute remains the previously approved implementation addition required to store the active attendance code.
