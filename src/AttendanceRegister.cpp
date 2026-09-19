@@ -1,10 +1,59 @@
 #include "AttendanceRegister.h"
+#include "Exceptions.h"
+#include "Enrolment.h"
 
 using namespace std;
 
 void AttendanceRegister::markpresent(Student& student,
                                      AttendanceSession& session)
 {
+    if (!session.isOpen())
+    {
+        throw SessionClosedException(
+            "Cannot mark attendance: session is closed."
+        );
+    }
+
+    Course* course = session.getCourse();
+
+    if (course == nullptr)
+    {
+        throw NotEnrolledException(
+            "Cannot mark attendance: session has no course."
+        );
+    }
+
+    bool enrolled = false;
+
+    for (Enrolment* enrolment : course->viewEnrolment())
+    {
+        if (enrolment != nullptr &&
+            enrolment->getStudent() == &student)
+        {
+            enrolled = true;
+            break;
+        }
+    }
+
+    if (!enrolled)
+    {
+        throw NotEnrolledException(
+            "Cannot mark attendance: student is not enrolled."
+        );
+    }
+
+    // ADD THE DUPLICATE CHECK HERE
+    for (const AttendanceRecord& record : records)
+    {
+        if (record.student == &student &&
+            record.session == &session)
+        {
+            throw DuplicateAttendanceException(
+                "Cannot mark attendance: student is already marked present."
+            );
+        }
+    }
+
     AttendanceRecord record(
         &student,
         &session,

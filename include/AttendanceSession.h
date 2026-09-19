@@ -24,9 +24,20 @@ private:
 public:
     AttendanceSession();
 
+    AttendanceSession(Course& course,
+                      const TimeSlot& timeslot,
+                      int durationminute);
+
     void open();
     void close();
     bool isExpired();
+
+    bool isOpen() const;
+
+    Course* getCourse() const;
+    const TimeSlot& getTimeSlot() const;
+
+    int getDurationMinute() const;
 
     void setcapturemethod(AttendanceCapture* c);
 

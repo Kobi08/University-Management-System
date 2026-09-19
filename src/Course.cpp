@@ -54,10 +54,19 @@ void Course::addEnrolment(Enrolment& enrolment)
 {
     enroledstudentdetails.push_back(&enrolment);
 }
+void Course::removeEnrolment(Enrolment& enrolment)
+{
+    enroledstudentdetails.remove(&enrolment);
+}
 
 string Course::getCode() const
 {
     return code;
+}
+
+Lecturer* Course::getLecturer() const
+{
+    return asignlecturer;
 }
 
 void Course::addTimeSlot(const TimeSlot& slot)

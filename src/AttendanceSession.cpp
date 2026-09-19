@@ -13,6 +13,18 @@ AttendanceSession::AttendanceSession()
     capture = nullptr;
 }
 
+AttendanceSession::AttendanceSession(Course& course,
+                                     const TimeSlot& timeslot,
+                                     int durationminute)
+{
+    this->course = &course;
+    this->timeslot = timeslot;
+    this->opentime = 0;
+    this->isopen = false;
+    this->durationminute = durationminute;
+    this->capture = nullptr;
+}
+
 void AttendanceSession::open()
 {
     if (isopen)
@@ -60,6 +72,25 @@ bool AttendanceSession::isExpired()
 
     return difftime(currentTime, opentime)
            >= durationminute * 60;
+}
+bool AttendanceSession::isOpen() const
+{
+    return isopen;
+}
+
+Course* AttendanceSession::getCourse() const
+{
+    return course;
+}
+
+const TimeSlot& AttendanceSession::getTimeSlot() const
+{
+    return timeslot;
+}
+
+int AttendanceSession::getDurationMinute() const
+{
+    return durationminute;
 }
 
 void AttendanceSession::setcapturemethod(AttendanceCapture* c)

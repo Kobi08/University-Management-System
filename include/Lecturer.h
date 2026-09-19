@@ -11,11 +11,13 @@ using namespace std;
 
 class Course;
 class TimeSlot;
+class AttendanceSession;
 
 class Lecturer : public Person
 {
 private:
     list<Course*> assignedCourse;
+    AttendanceSession* activeSession;
 
 public:
     Lecturer(const string& name,
@@ -27,10 +29,11 @@ public:
 
     // TODO: Connect to Member 2's TimeSlot and AttendanceSession
     // implementation when those classes are available.
-    void openAttendanceSession(const TimeSlot& slot);
-
+    void addCourse(Course& course);
+    void openAttendanceSession(const TimeSlot& slot, int durationminute);
     // TODO: Connect to Member 2's AttendanceSession implementation.
     void closeAttendanceSession();
+    AttendanceSession* getActiveSession() const;
 
     ~Lecturer() override = default;
 };

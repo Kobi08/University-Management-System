@@ -48,5 +48,37 @@ public:
     {
     }
 };
+// Thrown when a student tries to mark attendance
+// for a course they are not enrolled in.
+class NotEnrolledException : public Exception
+{
+public:
+    explicit NotEnrolledException(const string& message)
+        : Exception(message)
+    {
+    }
+};
+
+// Thrown when a student tries to mark attendance
+// more than once for the same attendance session.
+class DuplicateAttendanceException : public Exception
+{
+public:
+    explicit DuplicateAttendanceException(const string& message)
+        : Exception(message)
+    {
+    }
+};
+
+// Thrown when attendance is attempted after
+// the attendance session has been closed.
+class SessionClosedException : public Exception
+{
+public:
+    explicit SessionClosedException(const string& message)
+        : Exception(message)
+    {
+    }
+};
 
 #endif
