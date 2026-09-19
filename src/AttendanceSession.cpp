@@ -98,6 +98,36 @@ void AttendanceSession::setcapturemethod(AttendanceCapture* c)
     capture = c;
 }
 
+void AttendanceSession::setcourse(Course* course)
+{
+    this->course = course;
+}
+
+void AttendanceSession::settimeslot(const TimeSlot& timeslot)
+{
+    this->timeslot = timeslot;
+}
+
+void AttendanceSession::setduration(int durationminute)
+{
+    this->durationminute = durationminute;
+}
+
+bool AttendanceSession::isopenstatus() const
+{
+    return isopen;
+}
+
+Course* AttendanceSession::getcourse() const
+{
+    return course;
+}
+
+const TimeSlot& AttendanceSession::gettimeslot() const
+{
+    return timeslot;
+}
+
 AttendanceSession::AttendanceSession(AttendanceSession&& other)
 {
     course = other.course;
@@ -136,4 +166,5 @@ AttendanceSession& AttendanceSession::operator=(AttendanceSession&& other)
 }
 
 AttendanceSession::~AttendanceSession()
-{}
+{
+}

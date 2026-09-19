@@ -24,7 +24,14 @@ string RotatingCodeCapture::captureNext()
     cout << "Enter attendance code: ";
     cin >> enteredCode;
 
-    return enteredCode;
+    if (enteredCode == currentCode)
+    {
+        return enteredCode;
+    }
+
+    cout << "Invalid attendance code." << endl;
+
+    return "";
 }
 
 void RotatingCodeCapture::endSession()
