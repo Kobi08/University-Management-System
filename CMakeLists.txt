@@ -10,6 +10,18 @@ add_compile_options(-Wall)
 include_directories(include)
 
 add_executable(UniversityManagementSystem
+
+    main.cpp
+
+    src/TimeSlot.cpp
+    src/Timetable.cpp
+    src/AttendanceSession.cpp
+    src/RotatingCodeCapture.cpp
+    src/AttendanceRecord.cpp
+    src/CorrectionRecord.cpp
+    src/AttendanceRegister.cpp
+
+)
       main.cpp
     src/Person.cpp
     src/Student.cpp
