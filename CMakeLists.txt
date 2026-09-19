@@ -22,3 +22,17 @@ add_executable(UniversityManagementSystem
     src/AttendanceRegister.cpp
 
 )
+      main.cpp
+    src/Person.cpp
+    src/Student.cpp
+    src/Lecturer.cpp
+    src/Administrator.cpp
+    src/Course.cpp
+    src/LectureCourse.cpp
+    src/LabCourse.cpp
+    src/ProjectCourse.cpp
+    src/AssessmentMarks.cpp
+    src/Enrolment.cpp
+    
+
+)
