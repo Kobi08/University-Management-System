@@ -30,6 +30,15 @@ public:
 
     void setcapturemethod(AttendanceCapture* c);
 
+    void setcourse(Course* course);
+    void settimeslot(const TimeSlot& timeslot);
+    void setduration(int durationminute);
+
+    bool isopenstatus() const;
+
+    Course* getcourse() const;
+    const TimeSlot& gettimeslot() const;
+
     AttendanceSession& operator=(const AttendanceSession&) = delete;
 
     AttendanceSession(AttendanceSession&& other);
