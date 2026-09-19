@@ -20,9 +20,6 @@ add_executable(UniversityManagementSystem
     src/AttendanceRecord.cpp
     src/CorrectionRecord.cpp
     src/AttendanceRegister.cpp
-
-)
-      main.cpp
     src/Person.cpp
     src/Student.cpp
     src/Lecturer.cpp
