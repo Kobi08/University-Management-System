@@ -560,3 +560,30 @@ The reference changes prevent pointers stored by `AttendanceRecord` from referri
 ### UML / Code Deviations
 
 1. Updated the build configuration only; no UML class, attribute, relationship, or domain method was changed.
+
+## 2026-09-19
+
+### AttendanceSession Integration
+
+- Added a public interface to associate a `Course` with an `AttendanceSession`.
+- Added a public interface to associate a `TimeSlot` with an `AttendanceSession`.
+- Added a public interface to configure the session duration.
+- Added a public method to check whether the attendance session is currently open.
+- Added public accessors for the associated `Course` and `TimeSlot`.
+
+### Reason
+
+The existing `AttendanceSession` stored the Course, TimeSlot, duration, and open state as private attributes. Member 1's Lecturer and attendance validation logic require controlled access to these values during integration.
+
+The new methods provide the minimum public interface required to configure and inspect an existing `AttendanceSession` without changing its overall architecture or internal data representation.
+
+### UML / Code Deviations
+
+1. Added `setcourse(Course*)` to configure the associated Course.
+2. Added `settimeslot(const TimeSlot&)` to configure the associated TimeSlot.
+3. Added `setduration(int)` to configure the session duration.
+4. Added `isopenstatus() const` to check the current session state.
+5. Added `getcourse() const` to access the associated Course.
+6. Added `gettimeslot() const` to access the associated TimeSlot.
+
+These additions are integration interfaces only. No existing UML attributes, relationships, or core session operations were removed or redesigned.
