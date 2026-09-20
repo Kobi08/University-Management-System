@@ -7,6 +7,7 @@
 #include "LectureCourse.h"
 #include "LabCourse.h"
 #include "ProjectCourse.h"
+#include "Enrolment.h"
 
 #include "TimeSlot.h"
 
@@ -28,6 +29,9 @@ void Menu::run()
     {
         // Temporary until full persistence is connected.
        loadUsers();
+       loadCourses();
+       loadEnrolments();
+
 
         while (!stop)
         {
@@ -244,6 +248,129 @@ if (std::getline(input, extra, '|'))
     }
 }
 
+void Menu::loadCourses()
+{
+    courses.clear();
+
+    Repository<std::string> courseRepository(
+        "data/courses.txt"
+    );
+
+    for (const std::string& row :
+         courseRepository.load())
+    {
+        std::istringstream input(row);
+
+        std::string type;
+        std::string code;
+        std::string title;
+        std::string creditText;
+        std::string capacityText;
+        std::string lecturerId;
+
+        if (!std::getline(input, type, '|') ||
+            !std::getline(input, code, '|') ||
+            !std::getline(input, title, '|') ||
+            !std::getline(input, creditText, '|') ||
+            !std::getline(input, capacityText, '|') ||
+            !std::getline(input, lecturerId, '|'))
+        {
+            throw CorruptDataException(
+                "Invalid course record: " + row
+            );
+        }
+
+        if (type.empty() ||
+            code.empty() ||
+            title.empty() ||
+            creditText.empty() ||
+            capacityText.empty() ||
+            lecturerId.empty())
+        {
+            throw CorruptDataException(
+                "Incomplete course record: " + row
+            );
+        }
+
+        int credit;
+        int capacity;
+
+        try
+        {
+            credit = std::stoi(creditText);
+            capacity = std::stoi(capacityText);
+        }
+        catch (...)
+        {
+            throw CorruptDataException(
+                "Invalid numeric value in course: " + row
+            );
+        }
+
+        Person* person = findUser(lecturerId);
+
+        Lecturer* lecturer =
+            dynamic_cast<Lecturer*>(person);
+
+        if (lecturer == nullptr)
+        {
+            throw CorruptDataException(
+                "Lecturer not found for course " +
+                code + ": " + lecturerId
+            );
+        }
+
+        std::unique_ptr<Course> course;
+
+        if (type == "Lecture")
+        {
+            course =
+                std::make_unique<LectureCourse>(
+                    code,
+                    title,
+                    credit,
+                    capacity,
+                    *lecturer
+                );
+        }
+        else if (type == "Lab")
+        {
+            course =
+                std::make_unique<LabCourse>(
+                    code,
+                    title,
+                    credit,
+                    capacity,
+                    *lecturer
+                );
+        }
+        else if (type == "Project")
+        {
+            course =
+                std::make_unique<ProjectCourse>(
+                    code,
+                    title,
+                    credit,
+                    capacity,
+                    *lecturer
+                );
+        }
+        else
+        {
+            throw CorruptDataException(
+                "Unknown course type: " + type
+            );
+        }
+
+        // Lecturer aggregates/reference the same course.
+        lecturer->addCourse(*course);
+
+        // Menu/application owns the course.
+        courses.push_back(
+            std::move(course)
+        );
+    }
+}
 void Menu::createDemo()
 {
     if (!users.empty())
@@ -308,6 +435,115 @@ void Menu::showloginmenu()
     std::cout << "Enter 0 as the User ID to exit.\n";
 }
 
+void Menu::loadEnrolments()
+{
+    Repository<std::string> enrolmentRepository(
+        "data/enrolments.txt"
+    );
+
+    for (const std::string& row :
+         enrolmentRepository.load())
+    {
+        std::istringstream input(row);
+
+        std::string studentId;
+        std::string courseCode;
+        std::string status;
+        std::string dateEnrolled;
+        std::string gradeText;
+
+        if (!std::getline(input, studentId, '|') ||
+            !std::getline(input, courseCode, '|') ||
+            !std::getline(input, status, '|') ||
+            !std::getline(input, dateEnrolled, '|') ||
+            !std::getline(input, gradeText, '|'))
+        {
+            throw CorruptDataException(
+                "Invalid enrolment record: " + row
+            );
+        }
+
+        if (studentId.empty() ||
+            courseCode.empty() ||
+            status.empty() ||
+            dateEnrolled.empty() ||
+            gradeText.empty())
+        {
+            throw CorruptDataException(
+                "Incomplete enrolment record: " + row
+            );
+        }
+
+        double grade;
+
+        try
+        {
+            grade = std::stod(gradeText);
+        }
+        catch (...)
+        {
+            throw CorruptDataException(
+                "Invalid grade in enrolment record: " + row
+            );
+        }
+
+        Person* person = findUser(studentId);
+
+        Student* student =
+            dynamic_cast<Student*>(person);
+
+        if (student == nullptr)
+        {
+            throw CorruptDataException(
+                "Student not found: " + studentId
+            );
+        }
+
+        Course* course =
+            findCourse(courseCode);
+
+        if (course == nullptr)
+        {
+            throw CorruptDataException(
+                "Course not found: " + courseCode
+            );
+        }
+
+        auto enrolment =
+            std::make_unique<Enrolment>(
+                *student,
+                *course,
+                status,
+                dateEnrolled,
+                grade
+            );
+
+        Enrolment* enrolmentPtr =
+            enrolment.get();
+
+        student->enrolments.push_back(
+            std::move(enrolment)
+        );
+
+        // Active/completed enrolments are visible
+        // from the course side.
+        if (status != "Dropped")
+        {
+            course->addEnrolment(
+                *enrolmentPtr
+            );
+        }
+
+        // Only currently enrolled courses belong
+        // in the student's active timetable.
+        if (status == "Enrolled")
+        {
+            student->timetable.addCourse(
+                *course
+            );
+        }
+    }
+}
 
 int Menu::number(const std::string& prompt,
                  int low,
