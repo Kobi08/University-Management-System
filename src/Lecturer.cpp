@@ -55,11 +55,16 @@ void Lecturer::openAttendanceSession(const TimeSlot& slot,
                 if (activeSession != nullptr)
                 {
                     activeSession->close();
-                    delete activeSession;
+
+                    sessionHistory.push_back(activeSession);
+
+                    activeSession = nullptr;
                 }
 
                 activeSession =
-                    new AttendanceSession(*course, slot, durationminute);
+                    new AttendanceSession(*course,
+                                          slot,
+                                          durationminute);
 
                 activeSession->open();
 
@@ -85,7 +90,8 @@ void Lecturer::closeAttendanceSession()
 
     activeSession->close();
 
-    delete activeSession;
+    sessionHistory.push_back(activeSession);
+
     activeSession = nullptr;
 
     cout << "Attendance session closed." << endl;
@@ -95,7 +101,25 @@ void Lecturer::addCourse(Course& course)
 {
     assignedCourse.push_back(&course);
 }
+
 AttendanceSession* Lecturer::getActiveSession() const
 {
     return activeSession;
+}
+
+Lecturer::~Lecturer()
+{
+    if (activeSession != nullptr)
+    {
+        activeSession->close();
+        delete activeSession;
+        activeSession = nullptr;
+    }
+
+    for (AttendanceSession* session : sessionHistory)
+    {
+        delete session;
+    }
+
+    sessionHistory.clear();
 }

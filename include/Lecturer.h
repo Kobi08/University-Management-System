@@ -19,6 +19,10 @@ private:
     list<Course*> assignedCourse;
     AttendanceSession* activeSession;
 
+    // Stores closed sessions so AttendanceRecord objects
+    // can continue referring to valid AttendanceSession objects.
+    list<AttendanceSession*> sessionHistory;
+
 public:
     Lecturer(const string& name,
              const string& password);
@@ -27,15 +31,17 @@ public:
 
     void viewEnrolment(Course& course) const;
 
-    // TODO: Connect to Member 2's TimeSlot and AttendanceSession
-    // implementation when those classes are available.
     void addCourse(Course& course);
-    void openAttendanceSession(const TimeSlot& slot, int durationminute);
-    // TODO: Connect to Member 2's AttendanceSession implementation.
+
+    void openAttendanceSession(const TimeSlot& slot,
+                               int durationminute);
+
     void closeAttendanceSession();
+
     AttendanceSession* getActiveSession() const;
 
-    ~Lecturer() override = default;
+    ~Lecturer() override;
+
 };
 
 #endif
