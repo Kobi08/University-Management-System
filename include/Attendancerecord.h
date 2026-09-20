@@ -30,6 +30,9 @@ public:
                                const AttendanceRecord& r);
 
                                friend class AttendanceRegister;
+
+    template<typename T>
+friend class Repository;
 };
 
 #endif

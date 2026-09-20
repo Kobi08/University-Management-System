@@ -57,3 +57,8 @@ string Person::getId() const
 {
     return id;
 }
+
+string Person::getPassword() const
+{
+    return password;
+}

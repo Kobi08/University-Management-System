@@ -30,6 +30,8 @@ public:
     string getName() const;
     string getId() const;
 
+    string getPassword() const;
+
     virtual void showMenu() = 0;
 
     virtual ~Person() = default;

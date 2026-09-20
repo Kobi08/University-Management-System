@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 #include "TimeSlot.h"
 #include "Course.h"
 #include "AssessmentMarks.h"
@@ -26,47 +27,22 @@
 using namespace std;
 
 int main(){ 
-       Student student("Kamal", "1234");
-    Lecturer lecturer("Dr. Perera", "5678");
-
-    Person* user1 = &student;
-    Person* user2 = &lecturer;
-
-    cout << "===== STUDENT TEST =====\n";
-
-    if (user1->login("1234"))
+    //   Menu menu;
+    // menu.run();
+   
+    try
     {
-        cout << "Login successful.\n";
-        user1->showMenu();
+        Menu menu;
+        menu.run();
     }
-    else
+    catch (const std::exception& error)
     {
-        cout << "Login failed.\n";
-    }
+        std::cerr << "Application error: "
+                  << error.what()
+                  << '\n';
 
-
-    cout << "\n===== LECTURER TEST =====\n";
-
-    if (user2->login("5678"))
-    {
-        cout << "Login successful.\n";
-        user2->showMenu();
-    }
-    else
-    {
-        cout << "Login failed.\n";
-    }
-
-
-    cout << "\n===== WRONG PASSWORD TEST =====\n";
-
-    if (user1->login("wrong"))
-    {
-        cout << "ERROR: Wrong password accepted!\n";
-    }
-    else
-    {
-        cout << "Wrong password correctly rejected.\n";
+        return 1;
     }
     return 0;
 }
+

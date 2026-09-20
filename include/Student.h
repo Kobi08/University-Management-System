@@ -6,6 +6,7 @@
 #include "Person.h"
 #include "Timetable.h"
 
+
 using namespace std;
 
 class Course;
@@ -33,6 +34,8 @@ public:
     void viewTimetable() const;
 
     friend ostream& operator<<(ostream& os, const Student& s);
+    template<typename T>
+    friend class Repository;
 
     ~Student() override = default;
 };

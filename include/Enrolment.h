@@ -31,6 +31,9 @@ public:
 
     friend ostream& operator<<(ostream& os,
                                const Enrolment& enrolment);
+
+    template<typename T>
+    friend class Repository;    
 };
 
 #endif

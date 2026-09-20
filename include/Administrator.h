@@ -10,22 +10,38 @@
 using namespace std;
 
 class Lecturer;
+class Student;
 
 class Administrator : public Person
 {
+
+private:
+    list<Student>* studentUsers = nullptr;
+    list<Lecturer>* lecturerUsers = nullptr;
+    list<Administrator>* administratorUsers = nullptr;
 public:
     Administrator(const string& name,
                   const string& password);
 
+    Administrator(const string& name,
+              const string& password,
+              const string& id);
+
     void showMenu() override;
 
-    void createUser(const string& name,
-                    const string& id,
+    void createUser(
+                    const string& name,
+                    const string& password,
                     const string& role);
 
     void updateUser(const string& id,
                     const string& newName,
                     const string& newPass);
+
+    void connectUsers(
+    list<Student>& students,
+    list<Lecturer>& lecturers,
+    list<Administrator>& administrators);
 
     bool removeUser(const string& id);
 

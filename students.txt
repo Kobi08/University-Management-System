@@ -1,1 +1,0 @@
-Student [Name: Kamal, ID: 001]

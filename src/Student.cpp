@@ -1,5 +1,8 @@
 #include "Student.h"
 #include "Course.h"
+#include "Person.h"
+#include <limits>
+#include <stdexcept>
 
 using namespace std;
 
@@ -16,15 +19,65 @@ Student::Student(const string& name,
 
 void Student::showMenu()
 {
-    cout << "\n===== Student Menu (" << getName() << ") =====\n";
-    cout << "1. Enroll in a course\n";
-    cout << "2. Drop a course\n";
-    cout << "3. View my timetable\n";
-    cout << "4. Check course completion\n";
-    cout << "0. Logout\n";
-    // Reading the choice and dispatching to the functions below is wired
-    // up by the Menu/UI layer (Phase 9) - this only defines what the
-    // student sees, satisfying FR1.3's polymorphic-menu requirement.
+    int choice=-1;
+
+    do
+    {
+        cout << "\n===== Student Menu (" << getName() << ") =====\n";
+        cout << "1. View Timetable\n";
+        cout << "2. Enroll Course\n";
+        cout << "3. Drop Course\n";
+        cout << "0. Logout\n";
+
+        cout << "\nEnter choice: ";
+
+if (!(cin >> choice))
+{
+    if (cin.eof())
+    {
+        return;
+    }
+
+    if (cin.bad())
+    {
+        throw std::runtime_error("Console input failed.");
+    }
+
+    cin.clear();
+
+    cin.ignore(
+        std::numeric_limits<std::streamsize>::max(),
+        '\n'
+    );
+
+    cout << "Please enter a menu number.\n";
+    continue;
+}
+
+        switch (choice)
+        {
+        case 1:
+            viewTimetable();
+            break;
+
+        case 2:
+            cout << "Enroll Course integration coming next.\n";
+            break;
+
+        case 3:
+            cout << "Drop Course integration coming next.\n";
+            break;
+
+        case 0:
+            logout();
+            cout << "Logged out.\n";
+            break;
+
+        default:
+            cout << "Invalid choice.\n";
+        }
+
+    } while (choice != 0);
 }
 
 void Student::enrollCourse(Course& course)
@@ -79,7 +132,6 @@ void Student::viewTimetable() const
 
 ostream& operator<<(ostream& os, const Student& s)
 {
-    os << "Student [Name: " << s.getName()
-       << ", ID: " << s.getId() << "]";
+    os << s.getId() << "|" << s.getName() << "|" << s.getPassword();
     return os;
 }
