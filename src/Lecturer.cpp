@@ -3,6 +3,7 @@
 #include "TimeSlot.h"
 #include "AttendanceSession.h"
 #include "Menu.h"
+#include "Enrolment.h"
 
 #include <iostream>
 #include <limits>
@@ -55,9 +56,61 @@ void Lecturer::showMenu()
 
         switch (choice)
         {
-            case 1:
-                cout << "View-enrolment integration coming next.\n";
-                break;
+case 1:
+{
+    if (assignedCourse.empty())
+    {
+        cout << "You have no assigned courses.\n";
+        break;
+    }
+
+    cout << "\n===== YOUR COURSES =====\n";
+
+    int index = 1;
+
+    for (Course* course : assignedCourse)
+    {
+        if (course != nullptr)
+        {
+            cout << index
+                 << ". "
+                 << course->getCode()
+                 << '\n';
+
+            ++index;
+        }
+    }
+
+    cout << "Enter course code: ";
+
+    string code;
+    cin >> code;
+
+    cin.ignore(
+        numeric_limits<streamsize>::max(),
+        '\n'
+    );
+
+    bool found = false;
+
+    for (Course* course : assignedCourse)
+    {
+        if (course != nullptr &&
+            course->getCode() == code)
+        {
+            viewEnrolment(*course);
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+    {
+        cout << "That course is not assigned to you.\n";
+    }
+
+    break;
+}
 
             case 2:
                 cout << "Open-attendance integration coming next.\n";
@@ -81,10 +134,33 @@ void Lecturer::showMenu()
 
 void Lecturer::viewEnrolment(Course& course) const
 {
-    // TODO: Display enrolments only for the lecturer's own course.
-    // This will use the final Course and Enrolment implementations.
+    // Lecturer may only view enrolments
+    // for a course assigned to them.
+    if (course.getLecturer() != this)
+    {
+        cout << "You are not assigned to this course.\n";
+        return;
+    }
 
-    (void)course;
+    list<Enrolment*> enrolments = course.viewEnrolment();
+
+    cout << "\n===== ENROLMENTS FOR "
+         << course.getCode()
+         << " =====\n";
+
+    if (enrolments.empty())
+    {
+        cout << "No students are enrolled in this course.\n";
+        return;
+    }
+
+    for (Enrolment* enrolment : enrolments)
+    {
+        if (enrolment != nullptr)
+        {
+            cout << *enrolment << '\n';
+        }
+    }
 }
 
 void Lecturer::openAttendanceSession(const TimeSlot& slot,
