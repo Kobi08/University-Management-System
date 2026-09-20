@@ -17,6 +17,7 @@ class Menu
 {
 private:
     friend class Administrator;
+    void loadUsers();
 
     // Own the application's users and courses.
     std::vector<std::unique_ptr<Person>> users;
@@ -66,10 +67,7 @@ public:
     void showloginmenu();
 
     // Separate handlers for the three existing user roles.
-    void studentMenu(Student& student);
-    void lecturerMenu(Lecturer& lecturer);
-    void administratorMenu(Administrator& administrator);
-
+   
     // Find existing objects by their identifiers.
     Person* findUser(const std::string& id) const;
     Course* findCourse(const std::string& code) const;

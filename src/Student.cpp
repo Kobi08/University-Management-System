@@ -5,6 +5,7 @@
 #include "Menu.h"
 #include <functional>
 #include <set>
+#include <limits>
 
 #include <ctime>
 #include <iomanip>
@@ -21,20 +22,74 @@ Student::Student(const string& name,
 {
 }
 
+Student::Student(const string& name,
+                 const string& password,
+                 const string& id)
+    : Person(name, password, id)
+{
+}
+
 Student::~Student() = default;
 
 void Student::showMenu()
 {
-    cout << "\n===== Student Menu (" << getName() << ") =====\n";
-    cout << "1. Enroll in a course\n";
-    cout << "2. Drop a course\n";
-    cout << "3. View my timetable\n";
-    cout << "4. Check course completion\n";
-    cout << "0. Logout\n";
+    int choice = -1;
 
-    // TODO: Menu choice handling will be connected by the Menu/UI layer.
+    do
+    {
+        cout << "\n===== STUDENT MENU =====\n";
+        cout << "Student: " << getName()
+             << " (" << getId() << ")\n\n";
+
+        cout << "1. View timetable\n";
+        cout << "2. Enrol in course\n";
+        cout << "3. Drop course\n";
+        cout << "4. Check course completion\n";
+        cout << "0. Logout\n";
+
+        cout << "\nEnter choice: ";
+
+        if (!(cin >> choice))
+        {
+            cin.clear();
+            cin.ignore(
+                numeric_limits<streamsize>::max(),
+                '\n'
+            );
+
+            cout << "Please enter a valid number.\n";
+            continue;
+        }
+
+        switch (choice)
+        {
+            case 1:
+                viewTimetable();
+                break;
+
+            case 2:
+                cout << "Enrolment menu integration coming next.\n";
+                break;
+
+            case 3:
+                cout << "Drop-course menu integration coming next.\n";
+                break;
+
+            case 4:
+                cout << "Course-completion menu integration coming next.\n";
+                break;
+
+            case 0:
+                logout();
+                cout << "Logged out.\n";
+                break;
+
+            default:
+                cout << "Invalid choice.\n";
+        }
+
+    } while (choice != 0);
 }
-
 void Student::enrollCourse(Course& course)
 {
     if (isEnrolled(course))

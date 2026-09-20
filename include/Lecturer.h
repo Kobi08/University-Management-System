@@ -27,6 +27,10 @@ public:
     Lecturer(const string& name,
              const string& password);
 
+    Lecturer(const string& name,
+         const string& password,
+         const string& id);
+
         Lecturer(const Lecturer&) = delete;
 
     Lecturer& operator=(const Lecturer&) = delete;

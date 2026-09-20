@@ -1,28 +1,313 @@
 #include "Menu.h"
 #include "Exceptions.h"
+#include "Student.h"
 #include "Lecturer.h"
+#include "Administrator.h"
+
+#include "LectureCourse.h"
+#include "LabCourse.h"
+#include "ProjectCourse.h"
+
+#include "TimeSlot.h"
 
 #include <iostream>
 #include <sstream>
+#include "Repository.h"
+#include <unordered_set>
 
 Menu::Menu(const std::string& path)
     : dataPath(path)
 {
 }
 
-std::string Menu::ask(const std::string& prompt)
+Menu::~Menu() = default;
+
+void Menu::run()
 {
-    std::cout << prompt;
-
-    std::string value;
-
-    if (!std::getline(std::cin, value))
+    try
     {
-        throw Exception("Input closed.");
+        // Temporary until full persistence is connected.
+       loadUsers();
+
+        while (!stop)
+        {
+            showloginmenu();
+
+            std::string id = ask("User ID: ");
+
+            if (id == "0")
+            {
+                stop = true;
+                std::cout << "Application closed.\n";
+                break;
+            }
+
+            std::string password = ask("Password: ");
+
+            Person* currentUser = findUser(id);
+
+            if (currentUser == nullptr ||
+                !currentUser->login(password))
+            {
+                std::cout
+                    << "Invalid user ID or password.\n";
+
+                continue;
+            }
+
+            current = currentUser;
+
+            std::cout << "\nWelcome, "
+                      << currentUser->getName()
+                      << "!\n";
+
+            // THIS is the important polymorphic call.
+            currentUser->showMenu();
+
+            current = nullptr;
+        }
+    }
+    catch (const Exception& error)
+    {
+        std::cout << "Application error: "
+                  << error.what()
+                  << '\n';
+    }
+    catch (const std::exception& error)
+    {
+        std::cout << "Application error: "
+                  << error.what()
+                  << '\n';
+    }
+}
+
+void Menu::loadUsers()
+{
+    users.clear();
+
+    Repository<std::string> studentRepository(
+        "data/students.txt"
+    );
+
+    Repository<std::string> lecturerRepository(
+        "data/lecturers.txt"
+    );
+
+    Repository<std::string> administratorRepository(
+        "data/administrators.txt"
+    );
+
+    std::unordered_set<std::string> usedIds;
+
+    auto splitUserRow =
+        [](const std::string& row,
+           std::string& id,
+           std::string& name,
+           std::string& password)
+    {
+        std::istringstream input(row);
+
+ if (!std::getline(input, id, '|') ||
+    !std::getline(input, name, '|') ||
+    !std::getline(input, password, '|'))
+{
+    throw CorruptDataException(
+        "Invalid user record: " + row
+    );
+}
+
+std::string extra;
+
+if (std::getline(input, extra, '|'))
+{
+    throw CorruptDataException(
+        "Too many fields in user record: " + row
+    );
+}
+
+        if (id.empty() ||
+            name.empty() ||
+            password.empty())
+        {
+            throw CorruptDataException(
+                "Incomplete user record: " + row
+            );
+        }
+    };
+
+    // ---------- STUDENTS ----------
+    for (const std::string& row :
+         studentRepository.load())
+    {
+        std::string id;
+        std::string name;
+        std::string password;
+
+        splitUserRow(
+            row,
+            id,
+            name,
+            password
+        );
+
+        if (!usedIds.insert(id).second)
+        {
+            throw CorruptDataException(
+                "Duplicate user ID: " + id
+            );
+        }
+
+        auto student =
+            std::make_unique<Student>(
+                name,
+                password,
+                id
+            );
+
+        student->setApplication(this);
+
+        users.push_back(
+            std::move(student)
+        );
     }
 
-    return value;
+    // ---------- LECTURERS ----------
+    for (const std::string& row :
+         lecturerRepository.load())
+    {
+        std::string id;
+        std::string name;
+        std::string password;
+
+        splitUserRow(
+            row,
+            id,
+            name,
+            password
+        );
+
+        if (!usedIds.insert(id).second)
+        {
+            throw CorruptDataException(
+                "Duplicate user ID: " + id
+            );
+        }
+
+        auto lecturer =
+            std::make_unique<Lecturer>(
+                name,
+                password,
+                id
+            );
+
+        lecturer->setApplication(this);
+
+        users.push_back(
+            std::move(lecturer)
+        );
+    }
+
+    // ---------- ADMINISTRATORS ----------
+    for (const std::string& row :
+         administratorRepository.load())
+    {
+        std::string id;
+        std::string name;
+        std::string password;
+
+        splitUserRow(
+            row,
+            id,
+            name,
+            password
+        );
+
+        if (!usedIds.insert(id).second)
+        {
+            throw CorruptDataException(
+                "Duplicate user ID: " + id
+            );
+        }
+
+        auto administrator =
+            std::make_unique<Administrator>(
+                name,
+                password,
+                id
+            );
+
+        administrator->setApplication(this);
+
+        users.push_back(
+            std::move(administrator)
+        );
+    }
 }
+
+void Menu::createDemo()
+{
+    if (!users.empty())
+    {
+        return;
+    }
+
+    auto student = std::make_unique<Student>(
+        "Demo Student",
+        "student123"
+    );
+
+    auto lecturer = std::make_unique<Lecturer>(
+        "Demo Lecturer",
+        "lecturer123"
+    );
+
+    auto administrator =
+        std::make_unique<Administrator>(
+            "Demo Administrator",
+            "admin123"
+        );
+
+    student->setApplication(this);
+    lecturer->setApplication(this);
+    administrator->setApplication(this);
+
+    Lecturer* lecturerPtr = lecturer.get();
+
+    users.push_back(std::move(student));
+    users.push_back(std::move(lecturer));
+    users.push_back(std::move(administrator));
+
+    auto oopCourse =
+        std::make_unique<LectureCourse>(
+            "CO2203",
+            "Object Oriented Programming",
+            3,
+            50,
+            *lecturerPtr
+        );
+
+    oopCourse->addTimeSlot(
+        TimeSlot(
+            "Monday",
+            9,
+            11,
+            "Lecture Hall 1"
+        )
+    );
+
+    lecturerPtr->addCourse(*oopCourse);
+
+    courses.push_back(std::move(oopCourse));
+}
+
+void Menu::showloginmenu()
+{
+    std::cout << "\n========================================\n";
+    std::cout << " UNIVERSITY MANAGEMENT SYSTEM\n";
+    std::cout << "========================================\n";
+    std::cout << "Enter 0 as the User ID to exit.\n";
+}
+
 
 int Menu::number(const std::string& prompt,
                  int low,
@@ -141,4 +426,19 @@ void Menu::listCourses() const
         std::cout << '\n';
     }
 }
+
+std::string Menu::ask(const std::string& prompt)
+{
+    std::cout << prompt;
+
+    std::string value;
+
+    if (!std::getline(std::cin, value))
+    {
+        throw Exception("Input closed.");
+    }
+
+    return value;
+}
+
 

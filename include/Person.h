@@ -28,6 +28,10 @@ protected:
     Person(const string& name,
            const string& password);
 
+    Person(const string& name,
+       const string& password,
+       const string& id);
+
 public:
     void setApplication(Menu* app)
     {
