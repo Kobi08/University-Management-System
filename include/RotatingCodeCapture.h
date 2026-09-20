@@ -16,6 +16,11 @@ public:
     void beginSession() override;
     string captureNext() override;
     void endSession() override;
+
+    std::string name() const override
+    {
+        return "RotatingCode";
+    }
 };
 
 #endif

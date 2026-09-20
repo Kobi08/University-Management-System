@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
+#include <vector>
 
 #include "Person.h"
 #include "Timetable.h"
@@ -10,12 +12,16 @@
 using namespace std;
 
 class Course;
+class Enrolment;
 
 
 class Student : public Person
 {
 private:
     Timetable timetable;
+        friend class Menu;
+
+    std::vector<std::unique_ptr<Enrolment>> enrolments;
 
 public:
     Student(const string& name,
@@ -33,7 +39,7 @@ public:
 
     friend ostream& operator<<(ostream& os, const Student& student);
 
-    ~Student() override = default;
+        ~Student() override;
 };
 
 #endif

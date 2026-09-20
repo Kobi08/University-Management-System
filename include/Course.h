@@ -33,7 +33,11 @@ public:
            int capacity,
            Lecturer& asignlecturer,
            const list<string>& prerequisites = {});
-
+    
+    const list<string>& getPrerequisites() const
+    {
+        return prerequisites;
+    }
     virtual ~Course() = default;
 
     virtual double calculateGrade(const AssessmentMarks& marks) const = 0;

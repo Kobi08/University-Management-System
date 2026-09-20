@@ -805,3 +805,186 @@ destroyed safely through an AttendanceCapture pointer.
 ### UML / Code Deviation
 The destructor was not shown in the UML. No existing operation,
 attribute, or relationship was removed or changed.
+
+
+## Member 3 — FileReplayCapture implementation details
+
+- Change: Added filePath, inputFile, lineNumber and a constructor
+  accepting the replay file path.
+- Reason: Read a selected file and identify malformed input lines.
+- UML deviation: Added private implementation fields and a constructor.
+  The three UML capture operations remain unchanged.
+- Approved by: Member 3.
+
+
+## Member 3 — File-operation exceptions
+
+- Change: Added FileNotFoundException, CorruptDataException
+  and PersistenceException under the existing Exception base class.
+- Reason: Report file-opening, malformed-data and read/write failures
+  to the menu through exceptions.
+- Design alignment: The first two are specified in the report.
+  PersistenceException is an additional implementation exception.
+- Approved by: Member 3.
+
+
+## Member 3 — Generic repository
+
+- Change: Implemented Repository<T> with a file-path constructor
+  and load, save, add and remove operations.
+- Container decision: Used vector<T>, as allowed by Member 3.
+  The UML used list<T>; the report's interface table used vector<T>.
+- Reason: Provide one reusable interface for file storage.
+- Save behaviour: Write a temporary file and retain the previous
+  saved version as a backup.
+- Implementation detail: Template definitions remain in Repository.h.
+- Approved by: Member 3.
+
+## Member 3 — Person persistence and application connection
+
+- Change: Added Menu and Administrator as friends of Person.
+- Reason: Allow the persistence layer to restore account fields
+  and the ID counter, and allow administrator account updates.
+- Change: Added a non-owning Menu* application, initially nullptr,
+  and setApplication(Menu*).
+- Reason: Connect each user's role-specific interface to the
+  application that manages shared data and menus.
+- UML deviation: Added friendship declarations, the application
+  reference and its setter. Existing fields remain private.
+- Approved by: Member 3.
+
+
+## Member 3 — Menu application state and integration interface
+
+- Change: Added owned user/course collections and an AttendanceRegister
+  to Menu, plus the data path, current user and control flags.
+- Reason: The application needs one place to manage live objects.
+- Ownership: Users and courses use vector<unique_ptr<...>>.
+  The current-user pointer is non-owning.
+- Change: Added role handlers, lookup functions, persistence helpers,
+  demo setup and reference checks.
+- Reason: Connect the existing domain classes to user interaction
+  and file storage while preserving object relationships.
+- UML deviation: Expanded Menu beyond run() and showloginmenu().
+  Both original operations remain.
+- Approved by: Member 3.
+
+
+## Member 3 — Drop status and enrolment history
+
+- Change: Added Student and Menu friendship to Enrolment.
+- Reason: Allow controlled status updates and persistence access.
+- Change: dropCourse marks an owned enrolment as Dropped,
+  removes its active course reference and updates the timetable.
+- Change: isEnrolled checks the student's owned records and
+  requires the Enrolled status.
+- Reason: Retain history while distinguishing active enrolments.
+- Behaviour: Dropping without an active enrolment throws
+  the existing NotEnrolledException.
+- UML deviation: Added friendship declarations.
+  Existing enrolment status and public operation signatures remain.
+- Approved by: Member 3.
+
+## Member 3 — Prerequisite integration preparation
+
+- Change: Implemented Student::hasCompleted using the student's
+  owned enrolment history and Enrolment::isCompleted().
+- Reason: Replace the placeholder that always returned false.
+- Change: Added Course::getPrerequisites() const.
+- Reason: Allow recursive validation to read prerequisite codes
+  without modifying or copying the existing list.
+- UML deviation: Added a read-only getter.
+  No new field, class or grading rule was introduced.
+- Approved by: Member 3.
+
+## Member 3 — Recursive prerequisite integration
+
+- Change: Replaced the prerequisite TODO in Student::enrollCourse
+  with recursive validation.
+- Behaviour: Requires completion of direct and indirect prerequisites.
+  Rejects missing prerequisite courses and detected cycles.
+- Integration: Uses Menu::findCourse and the previously added
+  read-only Course::getPrerequisites getter.
+- Implementation: Local sets track courses being checked and
+  courses already checked.
+- UML deviation: No additional class, field or public method.
+- Approved by: Member 3.
+
+## Member 3 — AssessmentMarks ownership
+
+- Change: Enrolment now stores unique_ptr<AssessmentMarks>
+  instead of a non-owning AssessmentMarks pointer.
+- Change: setAssessmentMarks copies the supplied marks into
+  the owned object.
+- Reason: Prevent references to destroyed temporary marks and
+  retain assessment data for persistence.
+- Change: Declared the Enrolment destructor in the header and
+  defined it in the implementation file.
+- UML deviation: Enrolment explicitly owns its optional marks.
+- Approved by: Member 3.
+
+## Member 3 — Correction lecturer reference
+
+- Change: CorrectionRecord stores a non-owning Lecturer*
+  instead of a Lecturer value.
+- Change: Its constructor and AttendanceRegister::addcorrections
+  accept Lecturer&.
+- Reason: Copying Lecturer duplicates pointers to owned attendance
+  sessions and risks double deletion.
+- Change: Deleted Lecturer's copy constructor and copy assignment.
+- UML deviation: The acting lecturer is explicitly referenced,
+  rather than stored as an owned copy.
+- Approved by: Member 3.
+
+## Member 3 — Capture forwarding and source identification
+
+- Change: Added abstract AttendanceCapture::name() const
+  and implementations in both concrete capture classes.
+- Reason: Identify the actual capture source in attendance records.
+- Change: Added AttendanceSession::captureNext() and
+  captureName() const.
+- Reason: Let the UI request input through the session while
+  keeping the session independent of concrete capture classes.
+- Behaviour: Input capture rejects closed or expired sessions
+  and sessions without a capture method.
+- Change: AttendanceRegister records session.captureName()
+  instead of the fixed text "AttendanceRegister".
+- UML deviation: Added the above operations; no new fields or classes.
+- Approved by: Member 3.
+
+## Member 3 — Attendance-session eligibility snapshot
+
+- Change: Added eligibleStudentIds to AttendanceSession and
+  the read-only eligibleStudents() accessor.
+- Reason: Preserve who was enrolled when each session opened,
+  including students who never submitted attendance.
+- Behaviour: open() snapshots unique enrolled student IDs.
+  Move operations transfer this list with the session.
+- Change: Added Menu friendship for saving and restoring session state.
+- Change: Explicitly deleted the copy constructor to document
+  exclusive capture ownership.
+- Validation: Opening requires a course and positive duration;
+  capture initialization occurs before the session becomes open.
+- UML deviation: Added the eligibility list, accessor and
+  persistence friendship.
+- Approved by: Member 3.
+
+## Member 3 — Attendance reporting and correction integration
+
+- Change: AttendanceRegister keeps non-owning session references
+  and provides registerSession().
+- Reason: Count sessions with no attendance records.
+- Change: Percentages use the eligible roster stored at session opening.
+  Present and Late count as attended; Absent does not.
+- Change: CorrectionRecord stores correctedStatus.
+- Change: Added correct(), effectiveStatus() and showAudit().
+- Reason: Append corrections with the acting lecturer, reason,
+  timestamp and corrected status while preserving original records.
+- Behaviour: Only the course lecturer may correct attendance.
+  A correction for an unrecorded eligible student first creates
+  an immutable Absent baseline.
+- Change: Added Menu friendship to attendance records, corrections
+  and the register for persistence.
+- UML deviation: Added the session-reference collection,
+  correctedStatus, integration operations and persistence friendship.
+- Approved by: Member 3.

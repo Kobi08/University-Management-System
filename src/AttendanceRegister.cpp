@@ -1,6 +1,7 @@
 #include "AttendanceRegister.h"
 #include "Exceptions.h"
 #include "Enrolment.h"
+#include <ctime>
 
 using namespace std;
 
@@ -61,23 +62,26 @@ if (session.isExpired())
         }
     }
 
-    AttendanceRecord record(
+       AttendanceRecord record(
         &student,
         &session,
         "Present",
         time(nullptr),
-        "AttendanceRegister"
+        session.captureName()
     );
 
     records.push_back(record);
 }
 
-void AttendanceRegister::addcorrections(AttendanceRecord rec,
-                                         string reason,
-                                         Lecturer lecturer)
+
+void AttendanceRegister::addcorrections(
+    AttendanceRecord record,
+    std::string reason,
+    Lecturer& lecturer
+)
 {
     CorrectionRecord correction(
-        rec,
+        record,
         lecturer,
         reason,
         time(nullptr)

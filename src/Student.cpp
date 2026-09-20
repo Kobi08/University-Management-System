@@ -2,6 +2,14 @@
 #include "Course.h"
 #include "Exceptions.h"
 #include "Enrolment.h"
+#include "Menu.h"
+#include <functional>
+#include <set>
+
+#include <ctime>
+#include <iomanip>
+#include <sstream>
+#include <utility>
 
 #include <iostream>
 
@@ -12,6 +20,8 @@ Student::Student(const string& name,
     : Person(name, password)
 {
 }
+
+Student::~Student() = default;
 
 void Student::showMenu()
 {
@@ -27,23 +37,85 @@ void Student::showMenu()
 
 void Student::enrollCourse(Course& course)
 {
+    if (isEnrolled(course))
+    {
+        throw Exception(
+            "Cannot enrol: student is already enrolled in this course."
+        );
+    }
+
     if (course.isFull())
     {
         throw CourseFullException(
             "Cannot enrol: course is full."
         );
     }
-    if (isEnrolled(course))
-{
-    throw Exception(
-        "Cannot enrol: student is already enrolled in this course."
-    );
-}
 
-    // TODO: Check prerequisite requirements.
-    // Recursive prerequisite validation will be completed
-    // when the required student completion history and
-    // prerequisite course information are available.
+       std::set<std::string> checking;
+    std::set<std::string> checked;
+
+    std::function<void(const Course&)> checkPrerequisites;
+
+    checkPrerequisites = [&](const Course& currentCourse)
+    {
+        const std::string currentCode = currentCourse.getCode();
+
+        // This course's prerequisite chain was already checked.
+        if (checked.count(currentCode) != 0)
+        {
+            return;
+        }
+
+        // Returning to a course still being checked means a cycle.
+        if (checking.count(currentCode) != 0)
+        {
+            throw PrerequisiteNotMetException(
+                "Cannot enrol: prerequisite cycle detected at " +
+                currentCode + "."
+            );
+        }
+
+        checking.insert(currentCode);
+
+        for (const std::string& prerequisiteCode :
+             currentCourse.getPrerequisites())
+        {
+            if (!hasCompleted(prerequisiteCode))
+            {
+                throw PrerequisiteNotMetException(
+                    "Cannot enrol: complete " +
+                    prerequisiteCode + " first."
+                );
+            }
+
+            if (application == nullptr)
+            {
+                throw PrerequisiteNotMetException(
+                    "Cannot check prerequisites: "
+                    "student is not connected to the application."
+                );
+            }
+
+            Course* prerequisite =
+                application->findCourse(prerequisiteCode);
+
+            if (prerequisite == nullptr)
+            {
+                throw PrerequisiteNotMetException(
+                    "Cannot check prerequisites: course " +
+                    prerequisiteCode + " was not found."
+                );
+            }
+
+            // Check the required course's own prerequisites.
+            checkPrerequisites(*prerequisite);
+        }
+
+        checking.erase(currentCode);
+        checked.insert(currentCode);
+    };
+
+    checkPrerequisites(course);
 
     if (timetable.hasClash(course))
     {
@@ -52,48 +124,71 @@ void Student::enrollCourse(Course& course)
         );
     }
 
-    Enrolment* enrolment = new Enrolment(
-    *this,
-    course,
-    "Enrolled",
-    "2026-09-19",
-    0
-);
+    const std::time_t now = std::time(nullptr);
 
-course.addEnrolment(*enrolment);
-timetable.addCourse(course);
+    std::ostringstream date;
+    date << std::put_time(
+        std::localtime(&now),
+        "%Y-%m-%d"
+    );
+
+    auto enrolment = std::make_unique<Enrolment>(
+        *this,
+        course,
+        "Enrolled",
+        date.str(),
+        0
+    );
+
+    // The student owns the enrolment.
+    enrolments.push_back(std::move(enrolment));
+
+    // The course refers to that same enrolment.
+    course.addEnrolment(*enrolments.back());
+
+    timetable.addCourse(course);
 }
 
 void Student::dropCourse(Course& course)
 {
-    for (Enrolment* enrolment : course.viewEnrolment())
+    for (const auto& enrolment : enrolments)
     {
-        if (enrolment != nullptr &&
-            enrolment->getStudent() == this)
+        if (enrolment->getCourse() == &course &&
+            enrolment->status == "Enrolled")
         {
+            enrolment->status = "Dropped";
+
             course.removeEnrolment(*enrolment);
             timetable.removeCourse(course);
+
             return;
         }
     }
-}
 
+    throw NotEnrolledException(
+        "Cannot drop: student is not enrolled in this course."
+    );
+}
 bool Student::hasCompleted(const string& courseCode) const
 {
-    // TODO: Check the student's Enrolment records once
-    // the Enrolment implementation is available.
+    for (const auto& enrolment : enrolments)
+    {
+        if (enrolment->getCourse()->getCode() == courseCode &&
+            enrolment->isCompleted())
+        {
+            return true;
+        }
+    }
 
-    (void)courseCode;
     return false;
 }
 
 bool Student::isEnrolled(const Course& course) const
 {
-    for (Enrolment* enrolment : course.viewEnrolment())
+    for (const auto& enrolment : enrolments)
     {
-        if (enrolment != nullptr &&
-            enrolment->getStudent() == this &&
-            enrolment->getCourse() == &course)
+        if (enrolment->getCourse() == &course &&
+            enrolment->status == "Enrolled")
         {
             return true;
         }

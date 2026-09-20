@@ -1,28 +1,39 @@
 #include "AttendanceSession.h"
 #include "AttendanceCapture.h"
+#include "Enrolment.h"
+#include "Student.h"
+#include "Exceptions.h"
 
-using namespace std;
+#include <algorithm>
+#include <utility>
 
 AttendanceSession::AttendanceSession()
+    : course(nullptr),
+      timeslot(),
+      opentime(0),
+      isopen(false),
+      durationminute(0),
+      capture(nullptr)
 {
-    course = nullptr;
-    timeslot = TimeSlot();
-    opentime = 0;
-    isopen = false;
-    durationminute = 0;
-    capture = nullptr;
 }
 
-AttendanceSession::AttendanceSession(Course& course,
-                                     const TimeSlot& timeslot,
-                                     int durationminute)
+AttendanceSession::AttendanceSession(
+    Course& course,
+    const TimeSlot& timeslot,
+    int durationminute)
+    : course(&course),
+      timeslot(timeslot),
+      opentime(0),
+      isopen(false),
+      durationminute(durationminute),
+      capture(nullptr)
 {
-    this->course = &course;
-    this->timeslot = timeslot;
-    this->opentime = 0;
-    this->isopen = false;
-    this->durationminute = durationminute;
-    this->capture = nullptr;
+    if (durationminute <= 0)
+    {
+        throw Exception(
+            "Session duration must be greater than zero."
+        );
+    }
 }
 
 void AttendanceSession::open()
@@ -32,22 +43,52 @@ void AttendanceSession::open()
         return;
     }
 
-    opentime = time(nullptr);
-    isopen = true;
+    if (course == nullptr || durationminute <= 0)
+    {
+        throw Exception(
+            "Cannot open an unconfigured attendance session."
+        );
+    }
 
+    // Prepare a snapshot of the currently enrolled students.
+    std::vector<std::string> studentIds;
+
+    for (const Enrolment* enrolment : course->viewEnrolment())
+    {
+        if (enrolment == nullptr ||
+            enrolment->getStudent() == nullptr)
+        {
+            continue;
+        }
+
+        const std::string id =
+            enrolment->getStudent()->getId();
+
+        // Count each student only once.
+        if (std::find(
+                studentIds.begin(),
+                studentIds.end(),
+                id) == studentIds.end())
+        {
+            studentIds.push_back(id);
+        }
+    }
+
+    // Opening a replay file may throw.
+    // Do this before marking the session open.
     if (capture != nullptr)
     {
         capture->beginSession();
     }
+
+    eligibleStudentIds = std::move(studentIds);
+
+    opentime = std::time(nullptr);
+    isopen = true;
 }
 
 void AttendanceSession::close()
 {
-    if (!isopen)
-    {
-        return;
-    }
-
     if (capture != nullptr)
     {
         capture->endSession();
@@ -63,15 +104,10 @@ bool AttendanceSession::isExpired()
         return false;
     }
 
-    if (durationminute <= 0)
-    {
-        return false;
-    }
-
-    time_t currentTime = time(nullptr);
-
-    return difftime(currentTime, opentime)
-           >= durationminute * 60;
+    return std::difftime(
+        std::time(nullptr),
+        opentime
+    ) >= durationminute * 60.0;
 }
 
 bool AttendanceSession::isOpen() const
@@ -89,43 +125,94 @@ const TimeSlot& AttendanceSession::getTimeSlot() const
     return timeslot;
 }
 
-void AttendanceSession::setcapturemethod(AttendanceCapture* c)
+const std::vector<std::string>&
+AttendanceSession::eligibleStudents() const
 {
+    return eligibleStudentIds;
+}
+
+void AttendanceSession::setcapturemethod(
+    AttendanceCapture* c)
+{
+    if (c == capture)
+    {
+        return;
+    }
+
+    // This function takes ownership of the supplied pointer.
+    if (isopen)
+    {
+        delete c;
+
+        throw Exception(
+            "Choose the capture method before opening the session."
+        );
+    }
+
+    delete capture;
     capture = c;
 }
 
-AttendanceSession::AttendanceSession(AttendanceSession&& other)
+std::string AttendanceSession::captureNext()
 {
-    course = other.course;
-    timeslot = other.timeslot;
-    opentime = other.opentime;
-    isopen = other.isopen;
-    durationminute = other.durationminute;
-    capture = other.capture;
+    if (!isopen || isExpired())
+    {
+        throw SessionClosedException(
+            "Cannot capture attendance: session is closed or expired."
+        );
+    }
 
-    other.course = nullptr;
-    other.opentime = 0;
-    other.isopen = false;
-    other.durationminute = 0;
-    other.capture = nullptr;
+    if (capture == nullptr)
+    {
+        throw Exception(
+            "No attendance capture method has been selected."
+        );
+    }
+
+    return capture->captureNext();
 }
 
-AttendanceSession& AttendanceSession::operator=(AttendanceSession&& other)
+std::string AttendanceSession::captureName() const
+{
+    if (capture == nullptr)
+    {
+        return "None";
+    }
+
+    return capture->name();
+}
+
+AttendanceSession::AttendanceSession(
+    AttendanceSession&& other)
+    : AttendanceSession()
+{
+    *this = std::move(other);
+}
+
+AttendanceSession& AttendanceSession::operator=(
+    AttendanceSession&& other)
 {
     if (this != &other)
     {
-        course = other.course;
         timeslot = other.timeslot;
+
+        delete capture;
+
+        course = other.course;
         opentime = other.opentime;
         isopen = other.isopen;
         durationminute = other.durationminute;
+
         capture = other.capture;
 
+        eligibleStudentIds =
+            std::move(other.eligibleStudentIds);
+
+        other.capture = nullptr;
         other.course = nullptr;
         other.opentime = 0;
         other.isopen = false;
         other.durationminute = 0;
-        other.capture = nullptr;
     }
 
     return *this;
@@ -133,4 +220,5 @@ AttendanceSession& AttendanceSession::operator=(AttendanceSession&& other)
 
 AttendanceSession::~AttendanceSession()
 {
+    delete capture;
 }

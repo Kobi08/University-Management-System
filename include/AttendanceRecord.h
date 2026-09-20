@@ -19,6 +19,7 @@ private:
     string status;
     time_t timestamp;
     string capturedby;
+    friend class Menu;
 
 public:
     AttendanceRecord(Student* student,
