@@ -13,6 +13,7 @@
 #include "AttendanceRegister.h"
 #include "FileReplayCapture.h"
 #include "Repository.h"
+#include "Menu.h"
 #include <string>
 #include <vector>
 
@@ -367,93 +368,95 @@ int main()
 // }
 
     // Temporary FileReplayCapture test.
-    {
-        FileReplayCapture replay("replay.txt");
+    // {
+    //     FileReplayCapture replay("replay.txt");
 
-        try
-        {
-            replay.beginSession();
+    //     try
+    //     {
+    //         replay.beginSession();
 
-            while (true)
-            {
-                try
-                {
-                    std::string studentId = replay.captureNext();
+    //         while (true)
+    //         {
+    //             try
+    //             {
+    //                 std::string studentId = replay.captureNext();
 
-                    if (studentId.empty())
-                    {
-                        break;
-                    }
+    //                 if (studentId.empty())
+    //                 {
+    //                     break;
+    //                 }
 
-                    std::cout << "Read student ID: "
-                              << studentId << '\n';
-                }
-                catch (const CorruptDataException& error)
-                {
-                    std::cout << "Rejected: "
-                              << error.what() << '\n';
-                }
-            }
+    //                 std::cout << "Read student ID: "
+    //                           << studentId << '\n';
+    //             }
+    //             catch (const CorruptDataException& error)
+    //             {
+    //                 std::cout << "Rejected: "
+    //                           << error.what() << '\n';
+    //             }
+    //         }
 
-            replay.endSession();
+    //         replay.endSession();
 
-            std::cout << "Replay test finished.\n";
-        }
-        catch (const Exception& error)
-        {
-            std::cout << "Replay test failed: "
-                      << error.what() << '\n';
-        }
-    }
+    //         std::cout << "Replay test finished.\n";
+    //     }
+    //     catch (const Exception& error)
+    //     {
+    //         std::cout << "Replay test failed: "
+    //                   << error.what() << '\n';
+    //     }
+    // }
 
-        // Temporary Repository test.
-    {
-        try
-        {
-            Repository<std::string> repository(
-                "data/repository-test.txt"
-            );
+    //     // Temporary Repository test.
+    // {
+    //     try
+    //     {
+    //         Repository<std::string> repository(
+    //             "data/repository-test.txt"
+    //         );
 
-            std::vector<std::string> originalItems = {
-                "Student One",
-                "Lecturer One"
-            };
+    //         std::vector<std::string> originalItems = {
+    //             "Student One",
+    //             "Lecturer One"
+    //         };
 
-            repository.save(originalItems);
-            repository.add("Administrator One");
-            repository.remove("Lecturer One");
+    //         repository.save(originalItems);
+    //         repository.add("Administrator One");
+    //         repository.remove("Lecturer One");
 
-            std::vector<std::string> loadedItems =
-                repository.load();
+    //         std::vector<std::string> loadedItems =
+    //             repository.load();
 
-            std::cout << "\n===== REPOSITORY TEST =====\n";
+    //         std::cout << "\n===== REPOSITORY TEST =====\n";
 
-            for (const std::string& item : loadedItems)
-            {
-                std::cout << item << '\n';
-            }
+    //         for (const std::string& item : loadedItems)
+    //         {
+    //             std::cout << item << '\n';
+    //         }
 
-            const std::vector<std::string> expectedItems = {
-                "Student One",
-                "Administrator One"
-            };
+    //         const std::vector<std::string> expectedItems = {
+    //             "Student One",
+    //             "Administrator One"
+    //         };
 
-            if (loadedItems == expectedItems)
-            {
-                std::cout << "Repository test passed.\n";
-            }
-            else
-            {
-                std::cout << "Repository test failed: "
-                          << "loaded items do not match.\n";
-            }
-        }
-        catch (const Exception& error)
-        {
-            std::cout << "Repository test failed: "
-                      << error.what() << '\n';
-        }
-    }
+    //         if (loadedItems == expectedItems)
+    //         {
+    //             std::cout << "Repository test passed.\n";
+    //         }
+    //         else
+    //         {
+    //             std::cout << "Repository test failed: "
+    //                       << "loaded items do not match.\n";
+    //         }
+    //     }
+    //     catch (const Exception& error)
+    //     {
+    //         std::cout << "Repository test failed: "
+    //                   << error.what() << '\n';
+    //     }
+    // }
+
+   
 return 0;
   
 }
