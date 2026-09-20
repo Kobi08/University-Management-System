@@ -30,4 +30,7 @@ add_executable(UniversityManagementSystem
     src/ProjectCourse.cpp
     src/AssessmentMarks.cpp
     src/Enrolment.cpp
+    src/FileReplayCapture.cpp
+    src/Menu.cpp
+
 )

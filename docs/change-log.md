@@ -785,3 +785,23 @@ No new UML class, attribute, or public method was introduced.
 1. No UML deviation was introduced.
 
 The implementation only uses the existing `AttendanceSession::isExpired()` operation to validate whether attendance can be recorded.
+
+
+Member 3
+
+## AttendanceCapture — Virtual Destructor
+
+### Change
+Added `virtual ~AttendanceCapture() = default`.
+
+### Reason
+The specification requires abstract interfaces to have virtual
+destructors. The design report states that AttendanceSession owns
+its AttendanceCapture instance.
+
+A virtual destructor allows the concrete capture object to be
+destroyed safely through an AttendanceCapture pointer.
+
+### UML / Code Deviation
+The destructor was not shown in the UML. No existing operation,
+attribute, or relationship was removed or changed.

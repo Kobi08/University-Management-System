@@ -13,6 +13,8 @@ public:
     virtual string captureNext() = 0;
 
     virtual void endSession() = 0;
+
+    virtual ~AttendanceCapture() = default;
 };
 
 #endif
