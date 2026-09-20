@@ -8,7 +8,8 @@
 #include "Person.h"
 
 using namespace std;
-
+class AttendanceCapture;
+class Menu;
 class Course;
 class TimeSlot;
 class AttendanceSession;
@@ -22,6 +23,8 @@ private:
     // Stores closed sessions so AttendanceRecord objects
     // can continue referring to valid AttendanceSession objects.
     list<AttendanceSession*> sessionHistory;
+    friend class Administrator;
+    friend class Menu;
 
 public:
     Lecturer(const string& name,
@@ -43,6 +46,11 @@ public:
 
     void openAttendanceSession(const TimeSlot& slot,
                                int durationminute);
+
+    void openAttendanceSession(
+    const TimeSlot& slot,
+    int durationminute,
+    AttendanceCapture* capture);
 
     void closeAttendanceSession();
 

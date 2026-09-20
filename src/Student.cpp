@@ -3,6 +3,8 @@
 #include "Exceptions.h"
 #include "Enrolment.h"
 #include "Menu.h"
+#include "Lecturer.h"
+#include "AttendanceSession.h"
 #include <functional>
 #include <set>
 #include <limits>
@@ -44,9 +46,9 @@ void Student::showMenu()
         cout << "1. View timetable\n";
         cout << "2. Enrol in course\n";
         cout << "3. Drop course\n";
-        cout << "4. Check course completion\n";
+       cout << "4. Check course completion\n";
+        cout << "5. Mark attendance\n";
         cout << "0. Logout\n";
-
         cout << "\nEnter choice: ";
 
         if (!(cin >> choice))
@@ -162,7 +164,107 @@ void Student::showMenu()
 
                     break;
                 }
+            case 5:
+{
+    if (application == nullptr)
+    {
+        throw Exception(
+            "Student is not connected "
+            "to the application."
+        );
+    }
 
+    string courseCode;
+
+    cout << "Enter course code: ";
+    getline(cin, courseCode);
+
+    Course* course =
+        application->findCourse(
+            courseCode
+        );
+
+    if (course == nullptr)
+    {
+        throw Exception(
+            "Course not found."
+        );
+    }
+
+    if (!isEnrolled(*course))
+    {
+        throw NotEnrolledException(
+            "You are not currently enrolled "
+            "in this course."
+        );
+    }
+
+    AttendanceSession* session =
+        nullptr;
+
+    for (const auto& user :
+         application->users)
+    {
+        Lecturer* lecturer =
+            dynamic_cast<Lecturer*>(
+                user.get()
+            );
+
+        if (lecturer == nullptr)
+        {
+            continue;
+        }
+
+        AttendanceSession* candidate =
+            lecturer->getActiveSession();
+
+        if (candidate != nullptr &&
+            candidate->getCourse() ==
+                course &&
+            candidate->isOpen())
+        {
+            session =
+                candidate;
+
+            break;
+        }
+    }
+
+    if (session == nullptr)
+    {
+        throw SessionClosedException(
+            "No open attendance session "
+            "exists for this course."
+        );
+    }
+
+    if (session->captureName() !=
+        "RotatingCode")
+    {
+        throw Exception(
+            "This session is using FileReplayCapture. "
+            "Student code entry is unavailable."
+        );
+    }
+
+    const string captured =
+        session->captureNext();
+
+    if (captured.empty())
+    {
+        cout << "Attendance was not recorded.\n";
+        break;
+    }
+
+    application->attendance.markpresent(
+        *this,
+        *session
+    );
+    application->save();
+    cout << "Attendance recorded successfully.\n";
+
+    break;
+}
                 case 0:
                 {
                     logout();
