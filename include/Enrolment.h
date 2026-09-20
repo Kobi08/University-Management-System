@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 using namespace std;
 
@@ -13,12 +14,14 @@ class AssessmentMarks;
 class Enrolment
 {
 private:
+    friend class Student;
+    friend class Menu;
     Student* student;
     Course* course;
     string status;
     string dateEnrolled;
     double grade;
-    AssessmentMarks* assessmentMarks;
+    std::unique_ptr<AssessmentMarks> assessmentMarks;
 
 public:
     Enrolment(Student& student,
@@ -37,6 +40,8 @@ public:
 
     friend ostream& operator<<(ostream& os,
                                const Enrolment& enrolment);
+
+    ~Enrolment();
 };
 
 #endif

@@ -27,6 +27,10 @@ public:
     Lecturer(const string& name,
              const string& password);
 
+        Lecturer(const Lecturer&) = delete;
+
+    Lecturer& operator=(const Lecturer&) = delete;
+
     void showMenu() override;
 
     void viewEnrolment(Course& course) const;

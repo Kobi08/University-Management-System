@@ -1,8 +1,9 @@
 #ifndef ATTENDANCEREGISTER_H
 #define ATTENDANCEREGISTER_H
 
-#include <iostream>
 #include <list>
+#include <string>
+#include <vector>
 
 #include "AttendanceRecord.h"
 #include "CorrectionRecord.h"
@@ -11,26 +12,52 @@
 #include "Course.h"
 #include "Lecturer.h"
 
-using namespace std;
+class Menu;
 
 class AttendanceRegister
 {
 private:
-    list<AttendanceRecord> records;
-    list<CorrectionRecord> corrections;
+    friend class Menu;
+
+    std::list<AttendanceRecord> records;
+    std::list<CorrectionRecord> corrections;
+
+    // References sessions owned by lecturers.
+    std::vector<AttendanceSession*> sessions;
+
+    std::string effectiveStatus(
+        const AttendanceRecord& record
+    ) const;
 
 public:
-    void markpresent(Student& student,
-                     AttendanceSession& session);
+    void registerSession(AttendanceSession& session);
 
-    void addcorrections(AttendanceRecord rec,
-                        string reason,
-                        Lecturer lecturer);
+    void markpresent(
+        Student& student,
+        AttendanceSession& session
+    );
 
-    double getstudentpercentage(Student& student,
-                                Course& course);
+   void addcorrections(
+    AttendanceRecord record,
+    std::string reason,
+    Lecturer& lecturer
+);
+    void correct(
+        Student& student,
+        AttendanceSession& session,
+        Lecturer& lecturer,
+        const std::string& status,
+        const std::string& reason
+    );
+
+    double getstudentpercentage(
+        Student& student,
+        Course& course
+    );
 
     double getcoursepercentage(Course& course);
+
+    void showAudit() const;
 };
 
 #endif

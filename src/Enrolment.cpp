@@ -23,6 +23,8 @@ Enrolment::Enrolment(Student& student,
 {
 }
 
+Enrolment::~Enrolment() = default;
+
 double Enrolment::getGrade() const
 {
     return grade;
@@ -44,9 +46,9 @@ Course* Enrolment::getCourse() const
 
 void Enrolment::setAssessmentMarks(AssessmentMarks& marks)
 {
-    assessmentMarks = &marks;
+    assessmentMarks =
+        std::make_unique<AssessmentMarks>(marks);
 }
-
 void Enrolment::calculateGrade()
 {
     // TODO: Replace the temporary standard exception with

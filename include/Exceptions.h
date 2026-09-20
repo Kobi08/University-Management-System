@@ -81,4 +81,34 @@ public:
     }
 };
 
+// The requested file could not be opened.
+class FileNotFoundException : public Exception
+{
+public:
+    explicit FileNotFoundException(const string& message)
+        : Exception(message)
+    {
+    }
+};
+
+// The file contains invalid or incomplete data.
+class CorruptDataException : public Exception
+{
+public:
+    explicit CorruptDataException(const string& message)
+        : Exception(message)
+    {
+    }
+};
+
+// Reading or writing a file failed.
+class PersistenceException : public Exception
+{
+public:
+    explicit PersistenceException(const string& message)
+        : Exception(message)
+    {
+    }
+};
+
 #endif
