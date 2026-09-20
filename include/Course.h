@@ -12,6 +12,8 @@ class Course;
 class Enrolment;
 class Lecturer;
 class AssessmentMarks;
+class Menu;
+class Administrator;
 
 class Course
 {
@@ -20,6 +22,8 @@ private:
     string title;
     int credit;
     int capacity;
+    friend class Menu;
+    friend class Administrator;
 
     list<Enrolment*> enroledstudentdetails;
     list<string> prerequisites;

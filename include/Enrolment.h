@@ -10,12 +10,16 @@ using namespace std;
 class Student;
 class Course;
 class AssessmentMarks;
+class AttendanceSession;
+class AttendanceRegister;
 
 class Enrolment
 {
 private:
     friend class Student;
     friend class Menu;
+    friend class AttendanceSession;
+    friend class AttendanceRegister;
     Student* student;
     Course* course;
     string status;

@@ -53,13 +53,15 @@ void AttendanceSession::open()
     // Prepare a snapshot of the currently enrolled students.
     std::vector<std::string> studentIds;
 
-    for (const Enrolment* enrolment : course->viewEnrolment())
+   for (const Enrolment* enrolment :
+     course->viewEnrolment())
+{
+    if (enrolment == nullptr ||
+        enrolment->getStudent() == nullptr ||
+        enrolment->status != "Enrolled")
     {
-        if (enrolment == nullptr ||
-            enrolment->getStudent() == nullptr)
-        {
-            continue;
-        }
+        continue;
+    }
 
         const std::string id =
             enrolment->getStudent()->getId();

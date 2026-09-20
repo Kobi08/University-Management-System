@@ -13,6 +13,7 @@ using namespace std;
 
 class Course;
 class Enrolment;
+class Administrator;
 
 
 class Student : public Person
@@ -20,6 +21,7 @@ class Student : public Person
 private:
     Timetable timetable;
         friend class Menu;
+        friend class Administrator;
 
     std::vector<std::unique_ptr<Enrolment>> enrolments;
 

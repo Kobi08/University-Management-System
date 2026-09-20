@@ -17,9 +17,12 @@ class Menu
 {
 private:
     friend class Administrator;
+    friend class Student;
+    friend class Lecturer;
     void loadUsers();
     void loadCourses();
     void loadEnrolments();
+    void loadAttendance();
 
     // Own the application's users and courses.
     std::vector<std::unique_ptr<Person>> users;
