@@ -17,6 +17,10 @@ public:
     Administrator(const string& name,
                   const string& password);
 
+    Administrator(const string& name,
+              const string& password,
+              const string& id);
+
     void showMenu() override;
 
     void createUser(const string& name,

@@ -1,6 +1,8 @@
 #include "Administrator.h"
+#include "Menu.h"
 
 #include <iostream>
+#include <limits>
 
 using namespace std;
 
@@ -10,21 +12,86 @@ Administrator::Administrator(const string& name,
 {
 }
 
+Administrator::Administrator(
+    const string& name,
+    const string& password,
+    const string& id)
+    : Person(name, password, id)
+{
+}
 void Administrator::showMenu()
 {
-    cout << "\n===== Administrator Menu ("
-         << getName() << ") =====\n";
+    int choice = -1;
 
-    cout << "1. Create user\n";
-    cout << "2. Update user\n";
-    cout << "3. Remove user\n";
-    cout << "4. Create course\n";
-    cout << "5. Edit course\n";
-    cout << "6. Remove course\n";
-    cout << "7. Generate enrolment report\n";
-    cout << "0. Logout\n";
+    do
+    {
+        cout << "\n===== ADMINISTRATOR MENU =====\n";
+        cout << "Administrator: " << getName()
+             << " (" << getId() << ")\n\n";
 
-    // TODO: Menu choice handling will be connected by the Menu/UI layer.
+        cout << "1. Create user\n";
+        cout << "2. Update user\n";
+        cout << "3. Remove user\n";
+        cout << "4. Create course\n";
+        cout << "5. Edit course\n";
+        cout << "6. Remove course\n";
+        cout << "7. Generate enrolment report\n";
+        cout << "0. Logout\n";
+
+        cout << "\nEnter choice: ";
+
+        if (!(cin >> choice))
+        {
+            cin.clear();
+            cin.ignore(
+                numeric_limits<streamsize>::max(),
+                '\n'
+            );
+
+            cout << "Please enter a valid number.\n";
+            continue;
+        }
+
+        switch (choice)
+        {
+            case 1:
+                cout << "Create-user integration coming next.\n";
+                break;
+
+            case 2:
+                cout << "Update-user integration coming next.\n";
+                break;
+
+            case 3:
+                cout << "Remove-user integration coming next.\n";
+                break;
+
+            case 4:
+                cout << "Create-course integration coming next.\n";
+                break;
+
+            case 5:
+                cout << "Edit-course integration coming next.\n";
+                break;
+
+            case 6:
+                cout << "Remove-course integration coming next.\n";
+                break;
+
+            case 7:
+                generateEnrolmentReport();
+                break;
+
+            case 0:
+                logout();
+                cout << "Logged out.\n";
+                break;
+
+            default:
+                cout << "Invalid choice.\n";
+        }
+
+    } while (choice != 0);
 }
 
 void Administrator::createUser(const string& name,

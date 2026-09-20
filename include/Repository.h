@@ -24,32 +24,38 @@ public:
     }
 
     std::vector<T> load() const
-    {
-        std::ifstream input(filepath);
+{
+    std::ifstream input(filepath);
 
-        if (!input.is_open())
+    if (!input.is_open())
+    {
+        throw FileNotFoundException(
+            "Cannot open data file: " + filepath
+        );
+    }
+
+    std::vector<T> items;
+    std::string line;
+
+    while (std::getline(input, line))
+    {
+        if (line.empty())
         {
-            throw FileNotFoundException(
-                "Cannot open data file: " + filepath
-            );
+            continue;
         }
 
-        std::vector<T> items;
-        std::string line;
+        T item{};
 
-        while (std::getline(input, line))
+        if constexpr (std::is_same_v<T, std::string>)
+        {
+            // For strings, keep the complete line exactly as stored.
+            item = line;
+        }
+        else
         {
             std::istringstream row(line);
-            T item{};
 
-            if constexpr (std::is_same_v<T, std::string>)
-            {
-                row >> std::quoted(item);
-            }
-            else
-            {
-                row >> item;
-            }
+            row >> item;
 
             if (!row)
             {
@@ -66,19 +72,20 @@ public:
                     "Unexpected extra data in: " + filepath
                 );
             }
-
-            items.push_back(item);
         }
 
-        if (input.bad())
-        {
-            throw PersistenceException(
-                "Failed to read: " + filepath
-            );
-        }
-
-        return items;
+        items.push_back(item);
     }
+
+    if (input.bad())
+    {
+        throw PersistenceException(
+            "Failed to read: " + filepath
+        );
+    }
+
+    return items;
+}
 
     void save(const std::vector<T>& items) const
     {
@@ -107,14 +114,14 @@ public:
 
             for (const T& item : items)
             {
-                if constexpr (std::is_same_v<T, std::string>)
-                {
-                    output << std::quoted(item);
-                }
-                else
-                {
-                    output << item;
-                }
+         if constexpr (std::is_same_v<T, std::string>)
+        {
+            output << item;
+        }
+        else
+        {
+            output << item;
+        }
 
                 output << '\n';
             }

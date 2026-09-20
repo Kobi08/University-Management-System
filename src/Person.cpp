@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <algorithm>
 
 using namespace std;
 
@@ -25,6 +26,32 @@ Person::Person(const string& name,
       id(generateId()),
       password(password)
 {
+}
+
+Person::Person(const string& name,
+               const string& password,
+               const string& id)
+    : name(name),
+      id(id),
+      password(password)
+{
+    std::string numericPart = id;
+
+    if (!numericPart.empty() &&
+        numericPart.front() == 'U')
+    {
+        numericPart.erase(0, 1);
+    }
+
+    if (!numericPart.empty())
+    {
+        int loadedId = std::stoi(numericPart);
+
+        nextId = std::max(
+            nextId,
+            loadedId + 1
+        );
+    }
 }
 
 bool Person::login(const string& enteredPassword) const
