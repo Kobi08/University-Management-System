@@ -106,10 +106,18 @@ bool AttendanceSession::isExpired()
         return false;
     }
 
-    return std::difftime(
-        std::time(nullptr),
-        opentime
-    ) >= durationminute * 60.0;
+    const bool expired =
+        std::difftime(
+            std::time(nullptr),
+            opentime
+        ) >= durationminute * 60.0;
+
+    if (expired)
+    {
+        close();
+    }
+
+    return expired;
 }
 
 bool AttendanceSession::isOpen() const
