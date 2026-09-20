@@ -361,9 +361,7 @@ catch (const SessionClosedException& e)
          << e.what() << endl;
 }
 
-}
+
 return 0;
-
-
-   
+  
 }
