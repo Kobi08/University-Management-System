@@ -256,6 +256,41 @@ void Menu::loadCourses()
         "data/courses.txt"
     );
 
+    std::unordered_set<std::string> usedCourseCodes;
+
+    auto parseInt = [](const std::string& text,
+                       const std::string& fieldName,
+                       const std::string& row) -> int
+    {
+        try
+        {
+            std::size_t position = 0;
+
+            int value = std::stoi(
+                text,
+                &position
+            );
+
+            if (position != text.size())
+            {
+                throw std::invalid_argument(
+                    "extra characters"
+                );
+            }
+
+            return value;
+        }
+        catch (...)
+        {
+            throw CorruptDataException(
+                "Invalid " +
+                fieldName +
+                " in course record: " +
+                row
+            );
+        }
+    };
+
     for (const std::string& row :
          courseRepository.load())
     {
@@ -267,16 +302,21 @@ void Menu::loadCourses()
         std::string creditText;
         std::string capacityText;
         std::string lecturerId;
+        std::string prerequisiteText;
+        std::string timeSlotText;
 
         if (!std::getline(input, type, '|') ||
             !std::getline(input, code, '|') ||
             !std::getline(input, title, '|') ||
             !std::getline(input, creditText, '|') ||
             !std::getline(input, capacityText, '|') ||
-            !std::getline(input, lecturerId, '|'))
+            !std::getline(input, lecturerId, '|') ||
+            !std::getline(input, prerequisiteText, '|') ||
+            !std::getline(input, timeSlotText))
         {
             throw CorruptDataException(
-                "Invalid course record: " + row
+                "Invalid course record: " +
+                row
             );
         }
 
@@ -285,29 +325,50 @@ void Menu::loadCourses()
             title.empty() ||
             creditText.empty() ||
             capacityText.empty() ||
-            lecturerId.empty())
+            lecturerId.empty() ||
+            prerequisiteText.empty() ||
+            timeSlotText.empty())
         {
             throw CorruptDataException(
-                "Incomplete course record: " + row
+                "Incomplete course record: " +
+                row
             );
         }
 
-        int credit;
-        int capacity;
-
-        try
-        {
-            credit = std::stoi(creditText);
-            capacity = std::stoi(capacityText);
-        }
-        catch (...)
+        if (!usedCourseCodes.insert(code).second)
         {
             throw CorruptDataException(
-                "Invalid numeric value in course: " + row
+                "Duplicate course code: " +
+                code
             );
         }
 
-        Person* person = findUser(lecturerId);
+        const int credit =
+            parseInt(
+                creditText,
+                "credit",
+                row
+            );
+
+        const int capacity =
+            parseInt(
+                capacityText,
+                "capacity",
+                row
+            );
+
+        if (credit <= 0 ||
+            capacity <= 0)
+        {
+            throw CorruptDataException(
+                "Credit and capacity must be positive "
+                "in course record: " +
+                row
+            );
+        }
+
+        Person* person =
+            findUser(lecturerId);
 
         Lecturer* lecturer =
             dynamic_cast<Lecturer*>(person);
@@ -316,9 +377,49 @@ void Menu::loadCourses()
         {
             throw CorruptDataException(
                 "Lecturer not found for course " +
-                code + ": " + lecturerId
+                code +
+                ": " +
+                lecturerId
             );
         }
+
+        // -----------------------------
+        // Load prerequisites
+        // -----------------------------
+
+        std::list<std::string> prerequisites;
+
+        if (prerequisiteText != "-")
+        {
+            std::istringstream prerequisiteStream(
+                prerequisiteText
+            );
+
+            std::string prerequisiteCode;
+
+            while (std::getline(
+                prerequisiteStream,
+                prerequisiteCode,
+                ','))
+            {
+                if (prerequisiteCode.empty())
+                {
+                    throw CorruptDataException(
+                        "Invalid prerequisite list "
+                        "for course: " +
+                        code
+                    );
+                }
+
+                prerequisites.push_back(
+                    prerequisiteCode
+                );
+            }
+        }
+
+        // -----------------------------
+        // Create correct course subtype
+        // -----------------------------
 
         std::unique_ptr<Course> course;
 
@@ -330,7 +431,8 @@ void Menu::loadCourses()
                     title,
                     credit,
                     capacity,
-                    *lecturer
+                    *lecturer,
+                    prerequisites
                 );
         }
         else if (type == "Lab")
@@ -341,7 +443,8 @@ void Menu::loadCourses()
                     title,
                     credit,
                     capacity,
-                    *lecturer
+                    *lecturer,
+                    prerequisites
                 );
         }
         else if (type == "Project")
@@ -352,20 +455,148 @@ void Menu::loadCourses()
                     title,
                     credit,
                     capacity,
-                    *lecturer
+                    *lecturer,
+                    prerequisites
                 );
         }
         else
         {
             throw CorruptDataException(
-                "Unknown course type: " + type
+                "Unknown course type: " +
+                type
             );
         }
 
-        // Lecturer aggregates/reference the same course.
+        // -----------------------------
+        // Load time slots
+        //
+        // Multiple slots are separated
+        // using ;
+        //
+        // Example:
+        // Monday,8,10,Hall A;
+        // Wednesday,9,11,Lab 2
+        // -----------------------------
+
+        std::istringstream slotListStream(
+            timeSlotText
+        );
+
+        std::string slotText;
+        bool addedSlot = false;
+
+        while (std::getline(
+            slotListStream,
+            slotText,
+            ';'))
+        {
+            if (slotText.empty())
+            {
+                throw CorruptDataException(
+                    "Invalid time slot list "
+                    "for course: " +
+                    code
+                );
+            }
+
+            std::istringstream slotStream(
+                slotText
+            );
+
+            std::string day;
+            std::string startText;
+            std::string endText;
+            std::string location;
+
+            if (!std::getline(
+                    slotStream,
+                    day,
+                    ',') ||
+                !std::getline(
+                    slotStream,
+                    startText,
+                    ',') ||
+                !std::getline(
+                    slotStream,
+                    endText,
+                    ',') ||
+                !std::getline(
+                    slotStream,
+                    location))
+            {
+                throw CorruptDataException(
+                    "Invalid time slot for course " +
+                    code +
+                    ": " +
+                    slotText
+                );
+            }
+
+            if (day.empty() ||
+                startText.empty() ||
+                endText.empty() ||
+                location.empty())
+            {
+                throw CorruptDataException(
+                    "Incomplete time slot for course " +
+                    code +
+                    ": " +
+                    slotText
+                );
+            }
+
+            const int startTime =
+                parseInt(
+                    startText,
+                    "start time",
+                    row
+                );
+
+            const int endTime =
+                parseInt(
+                    endText,
+                    "end time",
+                    row
+                );
+
+            if (startTime < 0 ||
+                startTime > 23 ||
+                endTime < 1 ||
+                endTime > 24 ||
+                startTime >= endTime)
+            {
+                throw CorruptDataException(
+                    "Invalid time range for course " +
+                    code +
+                    ": " +
+                    slotText
+                );
+            }
+
+            course->addTimeSlot(
+                TimeSlot(
+                    day,
+                    startTime,
+                    endTime,
+                    location
+                )
+            );
+
+            addedSlot = true;
+        }
+
+        if (!addedSlot)
+        {
+            throw CorruptDataException(
+                "Course has no time slots: " +
+                code
+            );
+        }
+
+        // Lecturer keeps a non-owning reference.
         lecturer->addCourse(*course);
 
-        // Menu/application owns the course.
+        // Menu owns the actual Course object.
         courses.push_back(
             std::move(course)
         );
@@ -661,6 +892,51 @@ void Menu::listCourses() const
 
         std::cout << '\n';
     }
+}
+
+void Menu::save() const
+{
+    Repository<std::string> enrolmentRepository(
+        "data/enrolments.txt"
+    );
+
+    std::vector<std::string> savedRows;
+
+    for (const auto& user : users)
+    {
+        const Student* student =
+            dynamic_cast<const Student*>(user.get());
+
+        if (student == nullptr)
+        {
+            continue;
+        }
+
+        for (const auto& enrolment : student->enrolments)
+        {
+            if (enrolment == nullptr ||
+                enrolment->course == nullptr)
+            {
+                continue;
+            }
+
+            std::ostringstream row;
+
+            row << student->getId()
+                << "|"
+                << enrolment->course->getCode()
+                << "|"
+                << enrolment->status
+                << "|"
+                << enrolment->dateEnrolled
+                << "|"
+                << enrolment->grade;
+
+            savedRows.push_back(row.str());
+        }
+    }
+
+    enrolmentRepository.save(savedRows);
 }
 
 std::string Menu::ask(const std::string& prompt)

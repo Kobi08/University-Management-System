@@ -14,11 +14,37 @@ void Timetable::removeCourse(Course& course)
 
 void Timetable::display() const
 {
+    if (courses.empty())
+    {
+        cout << "No courses in timetable.\n";
+        return;
+    }
+
+    cout << "\n===== WEEKLY TIMETABLE =====\n";
+
     for (Course* course : courses)
     {
-        if (course != nullptr)
+        if (course == nullptr)
         {
-            cout << *course << endl;
+            continue;
+        }
+
+        cout << "\n"
+             << course->getCode()
+             << "\n";
+
+        const list<TimeSlot> slots =
+            course->getTimeSlots();
+
+        if (slots.empty())
+        {
+            cout << "  No time slots assigned.\n";
+            continue;
+        }
+
+        for (const TimeSlot& slot : slots)
+        {
+            cout << "  " << slot << '\n';
         }
     }
 }
