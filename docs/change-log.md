@@ -739,3 +739,27 @@ Validation was therefore implemented inside `captureNext()` to keep the existing
 3. Invalid input returns an empty string.
 
 The existing private `currentCode` attribute remains the previously approved implementation addition required to store the active attendance code.
+
+## 2026-09-20
+
+### AttendanceSession Lifetime Integration
+
+- Updated `Lecturer` to retain closed `AttendanceSession` objects until the Lecturer is destroyed.
+- Added a private `sessionHistory : list<AttendanceSession*>` to `Lecturer`.
+- Changed `closeAttendanceSession()` so that it closes the session without immediately deleting it.
+- Changed replacement of an active session so that the previous session is retained before a new session is created.
+- Added cleanup of retained sessions in the `Lecturer` destructor.
+
+### Reason
+
+`AttendanceRecord` stores a pointer to its associated `AttendanceSession`.
+
+Previously, `Lecturer::closeAttendanceSession()` immediately deleted the active session after closing it. This caused existing `AttendanceRecord` objects to contain dangling `AttendanceSession*` pointers.
+
+Closed sessions are therefore retained until the Lecturer is destroyed. This allows existing attendance records to continue referring to valid session objects while avoiding memory leaks.
+
+### UML / Code Deviations
+
+1. Added the private `sessionHistory : list<AttendanceSession*>` attribute to `Lecturer`.
+
+This is a minimal implementation-level ownership addition required to preserve the lifetime of AttendanceSession objects referenced by AttendanceRecord. No existing UML methods, attributes, or relationships were removed or redesigned.
