@@ -1,4 +1,5 @@
 #include "Course.h"
+#include "Enrolment.h"
 
 Course::Course(const string& code,
                const string& title,
@@ -19,17 +20,24 @@ Course::Course(const string& code,
 
 bool Course::isFull() const
 {
-    // TODO: Final enrolment count will be connected
-    // with the final Enrolment implementation.
+    int activeEnrolments = 0;
 
-    return static_cast<int>(enroledstudentdetails.size()) >= capacity;
+    for (const Enrolment* enrolment :
+         enroledstudentdetails)
+    {
+        if (enrolment != nullptr &&
+            !enrolment->isCompleted())
+        {
+            ++activeEnrolments;
+        }
+    }
+
+    return activeEnrolments >= capacity;
 }
 
 bool Course::hasPrerequisites(const string& code) const
 {
-    // TODO: This currently checks direct prerequisites only.
-    // Recursive prerequisite-chain validation will be completed
-    // as part of the Member 1 enrolment rules.
+   
 
     for (const string& prerequisite : prerequisites)
     {
@@ -44,8 +52,7 @@ bool Course::hasPrerequisites(const string& code) const
 
 list<Enrolment*> Course::viewEnrolment() const
 {
-    // TODO: Display and management of enrolment information
-    // will be connected to the final Enrolment implementation.
+    
 
     return enroledstudentdetails;
 }
@@ -71,16 +78,14 @@ Lecturer* Course::getLecturer() const
 
 void Course::addTimeSlot(const TimeSlot& slot)
 {
-    // TODO: Connect with Member 2's final TimeSlot implementation
-    // when the scheduling classes are available.
+   
 
     timeslot.push_back(slot);
 }
 
 list<TimeSlot> Course::getTimeSlots() const
 {
-    // TODO: Connect with Member 2's final scheduling implementation
-    // when the TimeSlot class is available.
+    
 
     return timeslot;
 }

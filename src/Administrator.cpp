@@ -474,13 +474,25 @@ void Administrator::showMenu()
     break;
 }
 
-                case 6:
-                {
-                    cout << "Course removal will be connected "
-                            "in the next batch.\n";
-                    break;
-                }
+              case 6:
+{
+    string code =
+        application->ask(
+            "Course code to remove: "
+        );
 
+    string removedCode =
+        removeCourse(code);
+
+    if (!removedCode.empty())
+    {
+        cout << "Course "
+             << removedCode
+             << " removed successfully.\n";
+    }
+
+    break;
+}
                 case 7:
                 {
                     generateEnrolmentReport();
