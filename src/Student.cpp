@@ -61,31 +61,133 @@ void Student::showMenu()
             continue;
         }
 
-        switch (choice)
+        cin.ignore(
+            numeric_limits<streamsize>::max(),
+            '\n'
+        );
+
+        try
         {
-            case 1:
-                viewTimetable();
-                break;
+            switch (choice)
+            {
+                case 1:
+                {
+                    viewTimetable();
+                    break;
+                }
 
-            case 2:
-                cout << "Enrolment menu integration coming next.\n";
-                break;
+                case 2:
+                {
+                    if (application == nullptr)
+                    {
+                        throw Exception(
+                            "Student is not connected to the application."
+                        );
+                    }
 
-            case 3:
-                cout << "Drop-course menu integration coming next.\n";
-                break;
+                    string code;
 
-            case 4:
-                cout << "Course-completion menu integration coming next.\n";
-                break;
+                    cout << "Enter course code to enrol: ";
+                    getline(cin, code);
 
-            case 0:
-                logout();
-                cout << "Logged out.\n";
-                break;
+                    Course* course =
+                        application->findCourse(code);
 
-            default:
-                cout << "Invalid choice.\n";
+                    if (course == nullptr)
+                    {
+                        cout << "Course not found.\n";
+                        break;
+                    }
+
+                    enrollCourse(*course);
+
+                        application->save();
+
+                        cout << "Successfully enrolled in "
+                            << course->getCode()
+                            << ".\n";
+
+                    break;
+                }
+
+                case 3:
+                {
+                    if (application == nullptr)
+                    {
+                        throw Exception(
+                            "Student is not connected to the application."
+                        );
+                    }
+
+                    string code;
+
+                    cout << "Enter course code to drop: ";
+                    getline(cin, code);
+
+                    Course* course =
+                        application->findCourse(code);
+
+                    if (course == nullptr)
+                    {
+                        cout << "Course not found.\n";
+                        break;
+                    }
+
+                    dropCourse(*course);
+                       application->save();
+                    cout << "Successfully dropped "
+                         << course->getCode()
+                         << ".\n";
+
+                    break;
+                }
+
+                case 4:
+                {
+                    string code;
+
+                    cout << "Enter course code: ";
+                    getline(cin, code);
+
+                    if (hasCompleted(code))
+                    {
+                        cout << code
+                             << " has been completed.\n";
+                    }
+                    else
+                    {
+                        cout << code
+                             << " has not been completed.\n";
+                    }
+
+                    break;
+                }
+
+                case 0:
+                {
+                    logout();
+                    cout << "Logged out.\n";
+                    break;
+                }
+
+                default:
+                {
+                    cout << "Invalid choice.\n";
+                    break;
+                }
+            }
+        }
+        catch (const Exception& error)
+        {
+            cout << "Error: "
+                 << error.what()
+                 << '\n';
+        }
+        catch (const std::exception& error)
+        {
+            cout << "Error: "
+                 << error.what()
+                 << '\n';
         }
 
     } while (choice != 0);
