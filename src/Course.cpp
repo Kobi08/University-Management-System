@@ -92,11 +92,23 @@ list<TimeSlot> Course::getTimeSlots() const
 
 ostream& operator<<(ostream& os, const Course& c)
 {
+    int activeEnrolments = 0;
+
+    for (const Enrolment* enrolment :
+         c.enroledstudentdetails)
+    {
+        if (enrolment != nullptr &&
+            !enrolment->isCompleted())
+        {
+            ++activeEnrolments;
+        }
+    }
+
     os << "Course [Code: " << c.code
        << ", Title: " << c.title
        << ", Credit: " << c.credit
        << ", Capacity: " << c.capacity
-       << ", Enrolled: " << c.enroledstudentdetails.size()
+       << ", Enrolled: " << activeEnrolments
        << "]";
 
     return os;

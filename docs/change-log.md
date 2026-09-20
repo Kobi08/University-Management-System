@@ -1,15 +1,16 @@
----------------------------------------------------
-| Date         | Change             | Reason       |
----------------------------------------------------
-## 2026-09-19
+# CO2203 OOP Group Project
 
-### TimeSlot
-    --------------------------------------------------- 
-    | Date         | Change          |  Reason        |   
-    ---------------------------------------------------
-## 2026-09-18
+## Design Change Log
 
-### Person
+This document records design and implementation changes made after the approved design checkpoint. Each entry describes the affected component, the implemented change, the reason for the change, and relevant UML/code deviations.
+
+---
+
+# 2026-09-18
+
+## Person
+
+### Changes
 
 - Made the `Person` constructor `protected`.
 - Added `const` qualifiers to read-only functions such as `login()`, `getName()`, and `getId()`.
@@ -28,18 +29,15 @@
 
 1. `Person` constructor visibility changed to `protected`.
 2. `const` qualifiers were added to read-only functions.
-3. A `virtual` destructor was added.
-4. Private `generateId()` was added as an implementation helper.
+3. A virtual destructor was added.
+4. A private `generateId()` helper was added.
 5. UML uses `getname()`, `getid()`, and `showmenu()`, while the code uses `getName()`, `getId()`, and `showMenu()`.
 
-These changes improve encapsulation, const-correctness, and safe polymorphism without adding new domain responsibilities.
+---
 
+## Student
 
-2. 
-
-## 2026-09-15
-
-### Student
+### Changes
 
 - Changed `enrollCourse(Course c)` to `enrollCourse(Course& course)`.
 - Changed `dropCourse(Course c)` to `dropCourse(Course& course)`.
@@ -49,18 +47,17 @@ These changes improve encapsulation, const-correctness, and safe polymorphism wi
 
 ### Reason
 
-`Course` is an abstract class, so passing it by value is inappropriate because it can cause object slicing and prevent proper use of polymorphism. References allow the original `Course` object to be used without copying or slicing.
+`Course` is an abstract class, so passing it by value is inappropriate because it can cause object slicing. References allow the original `Course` object to be used without copying or slicing.
 
 The `const` qualifiers were added to read-only functions to prevent them from modifying the `Student` object.
 
-The virtual default destructor explicitly overrides the virtual destructor inherited from `Person` and ensures safe destruction of `Student` objects through the inheritance hierarchy.
+The virtual default destructor explicitly overrides the virtual destructor inherited from `Person` and supports safe destruction through the inheritance hierarchy.
 
-3. 
+---
 
+## Lecturer
 
-## 2026-09-18
-
-### Lecturer
+### Changes
 
 - Changed `viewEnrolment(Course)` to `viewEnrolment(Course& course) const`.
 - Changed `openAttendanceSession(TimeSlot)` to `openAttendanceSession(const TimeSlot& slot)`.
@@ -74,308 +71,238 @@ The virtual destructor supports safe destruction of Lecturer objects through the
 
 ### UML / Code Deviations
 
-- `viewEnrolment()` uses a `Course&` and `const` qualifier instead of passing `Course` by value.
-- `openAttendanceSession()` uses `const TimeSlot&` instead of passing `TimeSlot` by value.
-- The virtual destructor is explicitly overridden in `Lecturer` for safe polymorphic destruction.
+1. `viewEnrolment()` uses `Course&` and `const` instead of passing `Course` by value.
+2. `openAttendanceSession()` uses `const TimeSlot&` instead of passing `TimeSlot` by value.
+3. A virtual destructor override was added.
 
-4. 
-## 2026-09-18
+---
 
-### Administrator
+## Administrator
+
+### Changes
 
 - Changed `createCourse()` and `editCourse()` lecturer parameters from `Lecturer` to `Lecturer&`.
-- Added `const` references for string and prerequisite-list parameters to avoid unnecessary copying.
-- Changed `removeUser()` to return `bool` to indicate whether the removal was successful.
-- Changed `removeCourse()` to return `string` for the course removal result.
+- Added `const` references for string and prerequisite-list parameters.
+- Changed `removeUser()` to return `bool`.
+- Changed `removeCourse()` to return `string`.
 - Added `~Administrator() override = default`.
 
 ### Reason
 
-`Lecturer&` allows the existing Lecturer object to be referenced without creating an unnecessary copy. `const` references avoid copying input strings and prerequisite lists while preventing modification of the supplied arguments. The return values of `removeUser()` and `removeCourse()` allow the result of the operation to be reported. The virtual default destructor safely overrides the `Person` destructor.
+References avoid unnecessary copying of existing Lecturer objects. `const` references avoid unnecessary copying while preventing modification of supplied arguments.
 
-5. 
+The return values of `removeUser()` and `removeCourse()` allow the result of the operation to be reported.
 
-## 2026-09-18
+The virtual destructor safely overrides the `Person` destructor.
 
-### Course - TimeSlot
+---
 
-- Changed the `Course` class `timeslot` attribute from `list<Timetable>` to `list<TimeSlot>`.
+## Course – TimeSlot
+
+### Changes
+
+- Changed the `Course` `timeslot` attribute from `list<Timetable>` to `list<TimeSlot>`.
 - Added `TimeSlot.h` to `Course.h`.
-- Implemented the Course-TimeSlot relationship by storing `TimeSlot` objects directly inside `Course`.
+- Implemented the Course–TimeSlot relationship by storing `TimeSlot` objects directly inside `Course`.
 
-### REASON
+### Reason
 
-The design identifies the relationship between `Course` and `TimeSlot` as a composition relationship.
+The design identifies the Course–TimeSlot relationship as composition.
 
-The original UML attribute was written as `list<Timetable>`, while `TimeSlot` represents an individual scheduled time. Therefore, `list<TimeSlot>` was used in the implementation to represent the Course-TimeSlot relationship directly.
+`TimeSlot` represents an individual scheduled time, so `list<TimeSlot>` directly represents the relationship.
 
-The `Course-Timetable` aggregation relationship is kept separately, with `Timetable` managing references to courses rather than being used as the Course's TimeSlot collection.
+The Course–Timetable aggregation remains separate, with `Timetable` managing references to courses.
 
-6. 
+---
 
-## 2026-09-18
+## AssessmentMarks and Course Grading Interface
 
-### AssessmentMarks and Course Grading Interface
+### Changes
 
-- Added a new `AssessmentMarks` class to store student-specific assessment marks.
-- Added `caScore`, `examScore`, `practicalMarks`, and `submissionScore` attributes to `AssessmentMarks`.
-- Added a constructor to initialize the assessment marks.
-- Set `caScore`, `examScore`, and `submissionScore` to `-1` initially to represent marks that have not yet been entered.
-- Initialized `practicalMarks` as an empty list.
-- Added setter methods for CA score, exam score, practical marks, and submission score.
-- Added getter methods for CA score, exam score, practical marks, and submission score.
-- Added validation to ensure all entered marks are within the valid range of 0 to 100.
-- Added `invalid_argument` exceptions for invalid assessment marks.
-- Changed the `Course::calculategrade()` function from `calculategrade()` to `calculategrade(const AssessmentMarks& marks)`.
-- Added `AssessmentMarks` as a parameter to the Course grading function so that grading can use the assessment marks of a particular student.
-- Associated `AssessmentMarks` with `Enrolment` because assessment marks are specific to a student's enrolment.
+- Added the `AssessmentMarks` class.
+- Added `caScore`, `examScore`, `practicalMarks`, and `submissionScore`.
+- Added constructor and getter/setter methods.
+- Initialized CA, examination, and submission scores to `-1`.
+- Initialized practical marks as an empty list.
+- Added validation for marks between 0 and 100.
+- Added `invalid_argument` exceptions for invalid marks.
+- Changed `Course::calculategrade()` to `calculategrade(const AssessmentMarks& marks)`.
+- Associated `AssessmentMarks` with `Enrolment`.
 
-### REASON
+### Reason
 
-The original design placed assessment-related attributes such as `practicalmarks` and `submissionscore` within specific Course subclasses. However, assessment marks are specific to individual students and should not be shared by all students enrolled in the same Course.
+Assessment marks are specific to individual students and should not be shared by every student taking a Course.
 
-A separate `AssessmentMarks` class was introduced to store the assessment information belonging to an individual student's enrolment.
+A separate `AssessmentMarks` class therefore stores student-specific assessment information.
 
-The value `-1` was used as the initial value for single assessment marks to distinguish marks that have not yet been entered from valid marks, since valid marks are restricted to the range 0 to 100. The practical marks collection is initially empty because no practical marks may have been entered yet.
+`-1` represents a mark that has not yet been entered, while valid marks are restricted to 0–100.
 
-Validation was added to prevent assessment marks outside the valid 0 to 100 range. An `invalid_argument` exception is thrown when an invalid mark is provided.
+The grading interface receives `AssessmentMarks` so that each Course subclass can calculate grades using the relevant student's marks while retaining runtime polymorphism.
 
-The `calculategrade()` interface was changed to accept an `AssessmentMarks` object so that each Course subclass can use the relevant assessment marks while maintaining specialized grading algorithms through runtime polymorphism.
+---
 
-`AssessmentMarks` is responsible for storing and validating assessment data, while the Course subclasses are responsible for calculating grades.
+## Course Relationships, Functions and Object Lifecycle
 
-This design change will be reflected in the final UML diagram and final project report.
+### Changes
 
-## 2026-09-18
+- Changed `enroledstudentdetails` from `list<Enrolment>` to `list<Enrolment*>`.
+- Changed `asignlecturer` from `Lecturer` to `Lecturer*`.
+- Changed `viewenrolment()` to return `list<Enrolment*>`.
+- Added `addTimeSlot(const TimeSlot& slot)`.
+- Added `getTimeSlots()`.
+- Added `addEnrolment(Enrolment& enrolment)`.
+- Added a `Course` constructor.
+- Added a virtual destructor.
 
-### Course Relationships, Functions and Object Lifecycle
+### Reason
 
-- Changed the `Course` class `enroledstudentdetails` attribute from `list<Enrolment>` in the UML to `list<Enrolment*>` in the implementation.
+The Course maintains references to existing Enrolment and Lecturer objects rather than storing separate copies.
 
-- Changed the `Course` class `asignlecturer` attribute from `Lecturer` in the UML to `Lecturer*` in the implementation.
+The additional methods provide controlled access to TimeSlots and enrolments.
 
-- Changed the return type of `viewenrolment()` from `list<Enrolment>` in the UML to `list<Enrolment*>` in the implementation.
+The constructor initializes Course information including capacity, Lecturer, and prerequisites.
 
-- Added `addTimeSlot(const TimeSlot& slot)` to allow TimeSlot objects to be added to a Course.
+The virtual destructor supports safe destruction of derived Course objects through the base Course class.
 
-- Added `getTimeSlots()` to allow the TimeSlots associated with a Course to be accessed.
+---
 
-- Added `addEnrolment(Enrolment& enrolment)` to allow an existing Enrolment object to be associated with a Course.
+## LectureCourse
 
-- Added a `Course` constructor to initialize the Course attributes and its associated Lecturer and prerequisites.
+### Changes
 
-- Added a virtual destructor to the `Course` class to support safe destruction of derived Course objects through the base `Course` class.
+- Implemented `LectureCourse` as a public derived class of `Course`.
+- Added a constructor.
+- Implemented `calculategrade(const AssessmentMarks& marks)`.
+- Added validation for missing CA and examination marks.
+- Implemented a project-defined 40% CA / 60% final examination weighting.
 
-### REASON
+### Reason
 
-The `Course` class maintains references to existing `Enrolment` objects rather than storing separate copies of them. Therefore, `list<Enrolment*>` was used to represent the associated enrolment objects.
+`LectureCourse` provides specialized grading behaviour while following the Course hierarchy and supporting runtime polymorphism.
 
-Similarly, a Course is assigned an existing Lecturer rather than creating and owning the Lecturer. Therefore, `Lecturer*` was used so that the Course can maintain a reference to the assigned Lecturer.
+Assessment marks remain in `AssessmentMarks` because they belong to individual students.
 
-The return type of `viewenrolment()` was changed consistently with the representation of the enrolment collection.
+The 40% / 60% weighting is a project-defined implementation assumption and is not presented as an official university grading rule.
 
-The `addTimeSlot()` and `getTimeSlots()` functions were added because the implementation stores the TimeSlot objects directly within the Course. These functions provide ways to add and access the TimeSlots associated with a Course.
+---
 
-The `addEnrolment()` function was added so that an existing Enrolment object can be stored in the Course's `list<Enrolment*>` collection. This allows the enrolment created during the student enrolment process to be associated with the relevant Course without creating a separate copy of the Enrolment object.
+## LabCourse
 
-A constructor was added so that a Course object can be initialized with its required information, including course details, capacity, assigned Lecturer, and prerequisites.
+### Changes
 
-A virtual destructor was added because `Course` is used as a base class for the Course hierarchy and supports runtime polymorphism. This allows derived Course objects to be safely destroyed through a `Course` base-class reference or pointer.
+- Removed `practicalmarks : list<double>` from `LabCourse`.
+- Added a `LabCourse` constructor.
+- Implemented `calculategrade(const AssessmentMarks& marks)`.
+- Added validation for missing practical marks.
+- Implemented grading using the average of entered practical marks.
 
-These changes will be reflected in the final UML diagram and final project report.
+### Reason
 
-8. 
+Practical marks are student-specific and therefore belong in `AssessmentMarks`.
 
-## 2026-09-18
+The average-of-practical-marks calculation is a project-defined implementation assumption.
 
-### LectureCourse Implementation and Grading
+---
 
-- Implemented the `LectureCourse` class as a public derived class of `Course`.
-- Added the `LectureCourse` constructor to initialize the inherited `Course` information, including course code, title, credit, capacity, assigned Lecturer, and prerequisites.
-- Implemented the `calculategrade(const AssessmentMarks& marks)` function required by the `Course` grading interface.
-- Used `AssessmentMarks` to obtain the student's CA score and examination score for grade calculation.
-- Added validation to ensure that both the CA score and examination score have been entered before calculating the grade.
-- Added `invalid_argument` exception handling when the required assessment marks have not been entered.
-- Implemented the LectureCourse grading calculation using a project-defined weighting of 40% for CA and 60% for the final examination.
-- Kept assessment marks outside the `LectureCourse` class because they are student-specific and are stored through `AssessmentMarks`.
+## ProjectCourse
 
-### REASON
+### Changes
 
-`LectureCourse` was implemented as a derived class of `Course` so that it can provide its own grading behaviour while following the Course hierarchy and supporting runtime polymorphism.
+- Removed `submissionscore : double` from `ProjectCourse`.
+- Added a `ProjectCourse` constructor.
+- Implemented `calculategrade(const AssessmentMarks& marks)`.
+- Added validation for missing submission scores.
+- Used the student's submission score as the ProjectCourse grade.
 
-The constructor passes the common course information to the base `Course` constructor so that the inherited Course attributes can be properly initialized.
+### Reason
 
-The grading function receives an `AssessmentMarks` object because CA and examination marks belong to an individual student's enrolment rather than to the Course itself.
-
-Validation was added to prevent grade calculation when the required CA or examination mark has not yet been entered. The `AssessmentMarks` class uses `-1` to represent a mark that has not yet been entered, so the LectureCourse grading function checks for this condition before performing the calculation.
-
-A 40% CA and 60% final examination weighting was selected as a project-defined grading assumption for LectureCourse. This weighting is an implementation/design assumption and is not being presented as an official university grading rule.
-
-The assessment data remains separated from `LectureCourse` so that the same Course object can be used for multiple students while each student's assessment marks remain associated with their individual enrolment.
-
-9. 
-
-## 2026-09-18
-
-### LabCourse Implementation and Grading
-
-- Removed the `practicalmarks : list<double>` attribute from the `LabCourse` class.
-- Added a `LabCourse` constructor to initialize the inherited `Course` information, including course code, title, credit, capacity, assigned Lecturer, and prerequisites.
-- Implemented the `calculategrade(const AssessmentMarks& marks)` function for `LabCourse`.
-- Changed the grading function to receive `AssessmentMarks` so that the practical marks of a particular student's enrolment can be used for grade calculation.
-- Implemented the LabCourse grading calculation using the average of the entered practical marks.
-- Added validation to prevent grade calculation when no practical marks have been entered.
-- Added `invalid_argument` exception handling for an empty practical-mark list.
-
-### REASON
-
-The `practicalmarks` attribute was removed from `LabCourse` because practical marks are specific to individual students rather than being shared by all students enrolled in the course. The practical marks are therefore stored in `AssessmentMarks`, which is associated with the student's enrolment.
-
-A constructor was added so that a `LabCourse` object can be initialized with the required Course information and pass that information to the base `Course` class.
-
-The `calculategrade()` implementation uses the `AssessmentMarks` object to access the practical marks belonging to a particular student. The final LabCourse grade is calculated as the average of the entered practical marks.
-
-Validation was added to prevent calculation when the practical-mark list is empty and to avoid division by zero. An `invalid_argument` exception is thrown when no practical marks have been entered.
-
-The average-of-practical-marks calculation is a project-defined grading assumption and is not being presented as an official university grading rule.
-
-These changes will be reflected in the final UML diagram and final project report.
-
-10. 
-
-## 2026-09-18
-
-### ProjectCourse Implementation and Grading
-
-- Removed the `submissionscore : double` attribute from the `ProjectCourse` class.
-- Added a `ProjectCourse` constructor to initialize the inherited `Course` information, including course code, title, credit, capacity, assigned Lecturer, and prerequisites.
-- Implemented the `calculategrade(const AssessmentMarks& marks)` function for `ProjectCourse`.
-- Used `AssessmentMarks` to obtain the submission score belonging to a particular student's enrolment.
-- Implemented the ProjectCourse grading calculation by using the student's submission score as the final grade.
-- Added validation to prevent grade calculation when a submission score has not been entered.
-- Added `invalid_argument` exception handling for a missing submission score.
-
-### REASON
-
-The `submissionscore` attribute was removed from `ProjectCourse` because the submission score is specific to an individual student rather than being shared by all students enrolled in the course. The submission score is therefore stored in `AssessmentMarks`, which is associated with the student's enrolment.
-
-A constructor was added so that a `ProjectCourse` object can be initialized with the required Course information and pass that information to the base `Course` class.
-
-The `calculategrade()` implementation uses the `AssessmentMarks` object to access the submission score belonging to a particular student. The submission score is used as the final ProjectCourse grade.
-
-Validation was added to prevent grade calculation when the submission score has not been entered. An `invalid_argument` exception is thrown when the submission score is unavailable.
+Submission scores are specific to individual students and are therefore stored in `AssessmentMarks`.
 
 Using the submission score directly as the ProjectCourse grade is a project-defined implementation assumption because the project specification does not provide a specific ProjectCourse grading formula.
 
-These changes will be reflected in the final UML diagram and final project report.
+---
 
+## Enrolment
 
-11. 
-## 2026-09-18
+### Changes
 
-### Enrolment
-
-- Changed the `Enrolment` class `student` attribute from `Student` in the UML to `Student*` in the implementation.
-- Changed the `Enrolment` class `course` attribute from `Course` in the UML to `Course*` in the implementation.
-- Changed the `dateEnrolled` attribute from `date` in the UML to `string` in the implementation.
-- Added an `AssessmentMarks* assessmentMarks` attribute to associate assessment marks with an Enrolment.
-- Added `setAssessmentMarks(AssessmentMarks& marks)` to assign assessment marks to an Enrolment.
-- Added `calculateGrade()` to calculate and store the student's grade using the associated Course's grading logic.
-- Added `getStudent() const` to access the Student associated with an Enrolment.
-- Added `getCourse() const` to access the Course associated with an Enrolment.
-- Added a friend `operator<<` for displaying Enrolment information.
+- Changed `student` from `Student` to `Student*`.
+- Changed `course` from `Course` to `Course*`.
+- Changed `dateEnrolled` from `date` to `string`.
+- Added `AssessmentMarks* assessmentMarks`.
+- Added `setAssessmentMarks(AssessmentMarks& marks)`.
+- Added `calculateGrade()`.
+- Added `getStudent() const`.
+- Added `getCourse() const`.
+- Added a friend `operator<<`.
 
 ### Reason
 
-The `Student*` and `Course*` pointers allow an Enrolment to refer to the existing Student and Course objects instead of creating separate copies.
+Pointers allow Enrolment to refer to existing Student and Course objects instead of creating copies.
 
-The `dateEnrolled` value is currently represented as a `string` to keep the implementation simple without introducing an additional date class.
+`dateEnrolled` is currently represented as a string to avoid introducing an additional date class.
 
-`AssessmentMarks` was introduced to keep student-specific assessment data separate from the Enrolment object while allowing the Enrolment to use those marks when calculating the final grade. The `setAssessmentMarks()` function associates the marks with the Enrolment, while `calculateGrade()` delegates the actual grading calculation to the associated Course.
+`AssessmentMarks` stores student-specific assessment information associated with the Enrolment.
 
-`getStudent()` and `getCourse()` provide controlled access to the existing Student and Course relationships without exposing the private data members directly.
+---
 
-The `operator<<` was added to provide formatted output of Enrolment information.
+## Custom Exception Hierarchy
 
-### UML / Code Deviations
+### Changes
 
-1. `Student` → `Student*`
-2. `Course` → `Course*`
-3. `date` → `string`
-4. Added `AssessmentMarks* assessmentMarks`.
-5. Added `setAssessmentMarks()`.
-6. Added `calculateGrade()`.
-7. Added `getStudent() const`.
-8. Added `getCourse() const`.
-9. Added `operator<<`.
-
-These changes will be reflected in the final UML diagram and final project report.
-
-
-12. 
-## 2026-09-18
-
-### Custom Exception Hierarchy
-
-- Created a custom `Exception` base class derived from `std::runtime_error`.
-- Added `CourseFullException` for course-capacity violations during enrolment.
-- Added `PrerequisiteNotMetException` for prerequisite violations during enrolment.
-- Added `TimetableClashException` for timetable-clash violations during enrolment.
+- Created `Exception` derived from `std::runtime_error`.
+- Added `CourseFullException`.
+- Added `PrerequisiteNotMetException`.
+- Added `TimetableClashException`.
 
 ### Reason
 
-The project specification requires a hierarchy of custom exceptions for domain-level rule violations.
+The project requires a custom exception hierarchy for domain-level rule violations.
 
-The project design uses separate exception classes for the main enrolment-rule violations so that each type of rejection can be identified and handled clearly.
+These exception types allow different enrolment validation failures to be identified and handled separately.
 
-`CourseFullException` is used when a course has reached its capacity.
+---
 
-`PrerequisiteNotMetException` is intended for prerequisite validation failures.
+# 2026-09-19
 
-`TimetableClashException` is intended for timetable conflicts during enrolment.
+## TimeSlot
 
-These exception classes are a design choice used to satisfy the project's custom exception requirement and provide clear domain-level error handling.
+### Changes
 
-### UML / Code Deviations
-
-- Added the custom exception hierarchy to support the required domain-level rule validation.
-- Added `CourseFullException`, `PrerequisiteNotMetException`, and `TimetableClashException` as concrete exception types.
-
-These additions will be reflected in the final UML diagram and project report.
-
-- Changed `operator==` return type from `ostream&` shown in the UML to `bool`.
-- Added constructors for `TimeSlot`.
-- Added getter methods for `TimeSlot`.
+- Changed `operator==` to return `bool`.
+- Added constructors.
+- Added getter methods.
 
 ### Reason
 
-The `operator==` function is used for equality and timetable clash detection, so a boolean return value is required.
+`operator==` is used for equality and timetable clash detection, so a boolean return value is required.
 
-The constructors and getter methods are required to create and access `TimeSlot` data from other classes.
+Constructors and getters are required to create and access TimeSlot data.
 
 ### UML / Code Deviations
 
-1. Changed `operator==` return type from `ostream&` to `bool`.
+1. Changed `operator==` return type from `ostream&` shown in the UML to `bool`.
 2. Added constructors for `TimeSlot`.
 3. Added getter methods for `TimeSlot`.
 
-These changes are limited to the implementation requirements and do not introduce additional domain responsibilities.
+---
 
+## Timetable
 
-## 2026-09-19
+### Changes
 
-### Timetable
-
-- Implemented the UML `courses` relationship using `list<Course*>` instead of `list<Course>`.
+- Implemented the UML `courses` relationship using `list<Course*>`.
 - Added `addCourse(Course&)`.
 - Added `removeCourse(Course&)`.
-- Implemented timetable display and course clash detection using the associated Course TimeSlots.
+- Implemented timetable display and course clash detection using Course TimeSlots.
 
 ### Reason
 
-`Course` is an abstract class and cannot be stored by value. `Course*` allows the Timetable to refer to existing Course objects.
+`Course` is abstract and therefore cannot be stored by value in the timetable.
 
-The UML contains a private course collection but does not provide operations for adding or removing courses from the timetable. `addCourse()` and `removeCourse()` are therefore required to manage the timetable courses and perform clash detection.
+Pointers allow the Timetable to refer to existing Course objects.
+
+The additional operations are required to manage courses in the timetable and perform clash detection.
 
 ### UML / Code Deviations
 
@@ -383,143 +310,139 @@ The UML contains a private course collection but does not provide operations for
 2. Added `addCourse(Course&)`.
 3. Added `removeCourse(Course&)`.
 
-These changes preserve the intended Course-Timetable relationship while using a valid C++ representation for an abstract Course type.
+---
 
+## AttendanceSession
 
-## 2026-09-19
+### Changes
 
-### AttendanceSession
-
-- Represented the UML `Course` relationship using `Course*`.
+- Represented the Course relationship using `Course*`.
 - Initialized `durationminute` to `0`.
-- Implemented session opening, closing, expiry checking, and attendance-capture method assignment.
+- Implemented session opening, closing, expiry checking, and attendance-capture assignment.
 - Added move construction and move assignment while keeping copy assignment disabled.
 
 ### Reason
 
-`Course` is an abstract class and cannot be stored directly as an object, so a pointer is used to refer to the associated Course.
+Course is abstract and cannot be stored directly as an object, so a pointer is used to refer to the associated Course.
 
-The UML does not provide a constructor parameter or setter for configuring `durationminute`, so it is initialized to `0`.
+The session operations implement the responsibilities represented in the UML.
 
-The session operations are implemented according to the responsibilities represented by the UML and the `AttendanceCapture` relationship.
+Move operations and disabled copy operations provide lifecycle handling required by the current implementation.
 
 ### UML / Code Deviations
 
-1. Represented the UML `Course` relationship using `Course*`.
+1. Represented the UML Course relationship using `Course*`.
 2. `durationminute` defaults to `0`.
-3. Move operations and deleted copy assignment are implementation-level lifecycle handling required by the current class design.
+3. Move operations and deleted copy operations were added for implementation-level lifecycle handling.
 
-No additional public domain operations were introduced.
+---
 
+## AttendanceCapture
 
-## 2026-09-19
+### Changes
 
-### AttendanceCapture
-
-- Implemented `AttendanceCapture` as an abstract interface with the UML-specified capture operations.
-- No `AttendanceCapture.cpp` file was created.
+- Implemented `AttendanceCapture` as an abstract interface.
+- Implemented the UML-specified capture operations as pure virtual functions.
+- No `.cpp` file was created.
+- Added a virtual destructor.
 
 ### Reason
 
-`beginSession()`, `captureNext()`, and `endSession()` are pure virtual functions and therefore do not have concrete implementations in the abstract interface.
+`beginSession()`, `captureNext()`, and `endSession()` are pure virtual functions and therefore do not require concrete implementations in the abstract interface.
+
+The virtual destructor allows concrete capture implementations to be safely destroyed through an `AttendanceCapture*`.
 
 ### UML / Code Deviations
 
 1. No `.cpp` implementation file was added because the class contains only pure virtual operations.
-2. No additional public methods or attributes were added.
+2. A virtual destructor was added for safe polymorphic destruction.
+3. No existing capture operation or relationship was removed.
 
+---
 
-## 2026-09-19
+## RotatingCodeCapture
 
-### RotatingCodeCapture
+### Changes
 
 - Implemented `RotatingCodeCapture` as a derived class of `AttendanceCapture`.
 - Implemented `beginSession()`, `captureNext()`, and `endSession()`.
-- Added the private `currentCode : string` attribute to store the generated attendance code.
+- Added private `currentCode : string`.
+- Updated `captureNext()` to validate the entered attendance code against the current active session code.
 
 ### Reason
 
-The class implements the `AttendanceCapture` interface and provides attendance-code capture behaviour.
+`currentCode` stores the currently generated attendance code during an active session.
 
-`currentCode` is required to store the currently generated attendance code during an active attendance session because the UML does not explicitly show attributes for `RotatingCodeCapture`.
-
-No additional rotation interval, timer, or code-generation attributes were added because these are not specified in the UML.
+Validation is implemented inside `captureNext()` without introducing a separate public validation method, keeping the existing interface unchanged.
 
 ### UML / Code Deviations
 
 1. Added the private `currentCode : string` attribute.
 2. No constructor was added because the UML does not specify one.
 3. No additional rotation interval, timer, or code-generation attributes were added.
+4. No new public validation method was added.
+5. Invalid input returns an unsuccessful result without recording attendance.
 
-These changes keep the implementation within the intended responsibilities of `RotatingCodeCapture`.
+---
 
+## AttendanceRecord
 
-## 2026-09-19
+### Changes
 
-### AttendanceRecord
-
-- Implemented the `AttendanceRecord` attributes and stream output operation.
-- Changed `timestamp : time` from the UML to `time_t timestamp`.
-- Represented `student : Student` as `Student* student`.
-- Represented `session : AttendanceSession` as `AttendanceSession* session`.
-- Added an `AttendanceRecord` constructor.
+- Implemented the AttendanceRecord attributes and stream output.
+- Changed `timestamp : time` to `time_t timestamp`.
+- Changed `student : Student` to `Student* student`.
+- Changed `session : AttendanceSession` to `AttendanceSession* session`.
+- Added an AttendanceRecord constructor.
 - Added `friend class AttendanceRegister`.
 
 ### Reason
 
-`time` is not a standard usable C++ data type for storing a time value, so `time_t` is used.
+`time_t` provides a usable C++ representation for time values.
 
-`AttendanceRecord` needs to refer to the existing Student and AttendanceSession objects rather than create separate copies, so pointers are used.
+Pointers allow AttendanceRecord to refer to existing Student and AttendanceSession objects.
 
-The constructor is required to initialize the private record attributes because the UML does not specify setter methods.
+The constructor initializes the private record attributes.
 
-`AttendanceRegister` requires access to the private record information when performing the UML-specified attendance calculations. Friend access avoids adding additional public methods that are not specified in the UML.
+Friend access allows AttendanceRegister to use the required private information without adding unnecessary public methods.
 
 ### UML / Code Deviations
 
 1. `timestamp : time` → `time_t timestamp`.
 2. `student : Student` → `Student* student`.
 3. `session : AttendanceSession` → `AttendanceSession* session`.
-4. Added an `AttendanceRecord` constructor.
+4. Added an AttendanceRecord constructor.
 5. Added `friend class AttendanceRegister`.
 
-No additional public methods or attributes were added.
+---
 
+## CorrectionRecord
 
-## 2026-09-19
+### Changes
 
-### CorrectionRecord
-
-- Implemented the `CorrectionRecord` attributes according to the UML.
-- Changed `timestamp : time` from the UML to `time_t timestamp`.
-- Added a constructor to initialize the private attributes.
-- Kept `originalrecord : AttendanceRecord` as a value member.
-- Kept `actinglecuturer : Lecturer` as a value member.
+- Implemented the CorrectionRecord attributes.
+- Changed `timestamp : time` to `time_t timestamp`.
+- Added a constructor.
 
 ### Reason
 
-`time` is not a standard usable C++ data type for storing a time value, so `time_t` is used.
+`time_t` is used as the C++ representation of a time value.
 
-The constructor is required to initialize the private attributes because the UML does not specify setter methods.
-
-The UML specifies `AttendanceRecord` and `Lecturer` as value attributes. The existing `Lecturer` class is copyable, so these value members can be represented directly.
-
-Pointer members were considered but not retained because `AttendanceRegister::addcorrections()` receives the AttendanceRecord and Lecturer by value, and storing pointers to those local parameters would create dangling pointers after the function returns.
+The constructor initializes private attributes because the UML does not specify setter methods.
 
 ### UML / Code Deviations
 
 1. `timestamp : time` → `time_t timestamp`.
 2. Added a constructor to initialize the private attributes.
 
-`originalrecord` and `actinglecuturer` remain value members as specified by the UML.
+---
 
+## AttendanceRegister
 
-## 2026-09-19
+### Changes
 
-### AttendanceRegister
-
-- Implemented the UML `records : list<AttendanceRecord>` relationship.
-- Implemented the UML `corrections : list<CorrectionRecord>` relationship.
+- Implemented `records : list<AttendanceRecord>`.
+- Implemented `corrections : list<CorrectionRecord>`.
 - Implemented `markpresent()`.
 - Implemented `addcorrections()`.
 - Implemented `getstudentpercentage()`.
@@ -527,43 +450,42 @@ Pointer members were considered but not retained because `AttendanceRegister::ad
 
 ### Reason
 
-The `records` and `corrections` collections are implemented as value lists, matching the UML.
+The collections match the UML relationships.
 
-`markpresent()` creates an AttendanceRecord for the supplied Student and AttendanceSession.
+`markpresent()` creates attendance records after validation.
 
-`addcorrections()` creates and stores a CorrectionRecord containing the original attendance record, reason, lecturer, and correction timestamp.
+`addcorrections()` stores correction information for attendance changes.
 
-The percentage functions inspect the stored attendance records and use the associated Student, AttendanceSession, Course, and status information to calculate attendance percentages.
-
-Friend access allows the register to use the required private data without introducing additional public getters that are not specified in the UML.
+The percentage functions calculate attendance using the stored attendance information.
 
 ### UML / Code Deviations
 
 1. `markpresent(Student student, AttendanceSession session)` uses `Student&` and `AttendanceSession&` in the implementation.
-2. The percentage method parameters use references where necessary to identify the existing Student and Course objects.
-3. Added `friend class AttendanceRegister` to `AttendanceRecord` and `AttendanceSession`.
-4. No additional public attributes or domain methods were added.
+2. Percentage method parameters use references where necessary to identify existing Student and Course objects.
+3. Added friend access where required by the attendance implementation.
+4. Additional session-reference and correction/reporting integration was added later during final integration.
 
-The reference changes prevent pointers stored by `AttendanceRecord` from referring to temporary local copies created by pass-by-value parameters.
+---
 
+## CMake Build Configuration
 
-## 2026-09-19
-
-### CMake Build Configuration
+### Changes
 
 - Added `src/AttendanceRegister.cpp` to the `UniversityManagementSystem` executable source list.
 
 ### Reason
 
-`AttendanceRegister.cpp` must be included in the CMake target so that the AttendanceRegister implementation is compiled and linked when the project is built with CMake.
+`AttendanceRegister.cpp` must be included in the CMake target so that the AttendanceRegister implementation is compiled and linked.
 
 ### UML / Code Deviations
 
-1. Updated the build configuration only; no UML class, attribute, relationship, or domain method was changed.
+- No UML class, attribute, relationship, or domain method was changed.
 
-## 2026-09-19
+---
 
-### Member 1 ↔ Member 2 Integration
+## Member 1 ↔ Member 2 Integration
+
+### Changes
 
 #### Exception Hierarchy
 
@@ -571,420 +493,882 @@ The reference changes prevent pointers stored by `AttendanceRecord` from referri
 - Added `DuplicateAttendanceException`.
 - Added `SessionClosedException`.
 
-These exceptions extend the existing `Exception` base class and provide the required attendance-related exception types for `AttendanceRegister` validation.
+These exceptions extend the existing `Exception` base class and provide the required attendance-related exception types.
 
 #### AttendanceSession Integration
 
-- Added a parameterized `AttendanceSession` constructor accepting:
-  - `Course&`
-  - `TimeSlot`
-  - `durationminute`
+- Added `AttendanceSession(Course&, const TimeSlot&, int durationminute)`.
 - Added `isOpen() const`.
 - Added `getCourse() const`.
 - Added `getTimeSlot() const`.
 - Added `getDurationMinute() const`.
-
-These changes allow the Lecturer and AttendanceRegister components to create and inspect an attendance session using the existing Course, TimeSlot, duration, and session-state information.
-
-### Reason
-
-The existing `AttendanceSession` already contained the required UML attributes:
-
-- `course`
-- `timeslot`
-- `opentime`
-- `isopen`
-- `durationminute`
-- `capture`
-
-However, the required integration could not access or initialise these values through the public interface.
-
-The new constructor and read-only accessors expose the existing session information without adding new domain attributes or changing the existing Course–TimeSlot–AttendanceSession relationships.
-
-### UML / Code Deviations
-
-1. Added a parameterized constructor to initialise the existing UML-defined `AttendanceSession` attributes.
-2. Added public read-only accessors for existing UML-defined attributes.
-3. No new data members or new UML relationships were introduced.
-
-These changes are necessary to allow `Lecturer`, `AttendanceRegister`, and the attendance workflow to interact with the existing `AttendanceSession` model while preserving the intended UML structure.
-
-
-## 2026-09-19
-
-### Member 1 ↔ Member 2 Integration — Attendance and Lecturer Integration
-
-#### Exception Hierarchy
-
-- Added `NotEnrolledException`.
-- Added `DuplicateAttendanceException`.
-- Added `SessionClosedException`.
-
-These exceptions extend the existing `Exception` base class and are used by `AttendanceRegister` to validate attendance operations.
-
-#### AttendanceSession Integration
-
-- Added a parameterized constructor:
-  `AttendanceSession(Course&, const TimeSlot&, int durationminute)`.
-- Added `isOpen() const`.
-- Added `getCourse() const`.
-- Added `getTimeSlot() const`.
-- Added `getDurationMinute() const`.
-
-These operations provide controlled access to the existing `AttendanceSession` attributes required for integration with `Lecturer` and `AttendanceRegister`.
 
 #### Course Integration
 
-- Added `getLecturer() const` to allow the Lecturer to verify whether a Course is assigned to that Lecturer.
+- Added `getLecturer() const`.
 
 #### Lecturer Integration
 
-- Added `AttendanceSession* activeSession` to store the currently active attendance session.
-- Added `addCourse(Course&)` to maintain the Lecturer's assigned course list.
-- Changed `openAttendanceSession(const TimeSlot&)` to:
-  `openAttendanceSession(const TimeSlot&, int durationminute)`.
-- Added `getActiveSession() const` to provide access to the currently active session for attendance operations.
-- Implemented the connection between Lecturer, Course, TimeSlot, and AttendanceSession.
-- The Lecturer now checks that the supplied TimeSlot belongs to one of the Lecturer's assigned courses before opening an attendance session.
+- Added `AttendanceSession* activeSession`.
+- Added `addCourse(Course&)`.
+- Changed `openAttendanceSession()` to accept a duration.
+- Added `getActiveSession() const`.
+- Connected Lecturer, Course, TimeSlot, and AttendanceSession.
 
 #### AttendanceRegister Integration
 
-- Added a session-open validation using `SessionClosedException`.
+- Added session-open validation using `SessionClosedException`.
 - Added student-enrolment validation using `NotEnrolledException`.
 - Added duplicate-attendance validation using `DuplicateAttendanceException`.
-- Attendance records are created only after all required validation checks succeed.
-- Included `Enrolment.h` in `AttendanceRegister.cpp` so the register can access the existing `Enrolment` interface when checking whether a Student is enrolled in the Course.
+- Attendance records are created only after the required validation checks succeed.
+- Connected AttendanceRegister with the existing Enrolment interface.
 
 ### Reason
 
-These changes connect the existing Member 1 domain classes with the Member 2 attendance implementation.
+These changes connect the Member 1 domain model with the Member 2 attendance implementation.
 
-The existing UML already defines the relationships between Lecturer, Course, TimeSlot, AttendanceSession, Student, Enrolment, and AttendanceRegister. The additional implementation members and operations were added only where the existing public interfaces were insufficient to perform the required integration.
+The additional interfaces allow the existing UML classes and relationships to work together without introducing new domain classes.
 
-The `AttendanceSession` constructor allows its existing UML-defined attributes to be initialised when a Lecturer opens a session.
+`activeSession` is required because the Lecturer needs to retain the currently active session for attendance operations and closing.
 
-The `AttendanceSession` getter functions provide controlled read-only access to existing session information without exposing private attributes directly.
-
-`Course::getLecturer()` allows the Lecturer to verify ownership of a Course using the existing `asignlecturer` relationship.
-
-`Lecturer::addCourse()` maintains the Lecturer's course collection so that attendance sessions can be opened only for courses assigned to that Lecturer.
-
-`Lecturer::activeSession` is required because `closeAttendanceSession()` has no session parameter and therefore needs to retain the currently active session.
-
-The duration parameter was added to `openAttendanceSession()` so that the session duration can be supplied when an attendance session is created instead of using a fixed value.
-
-The attendance validation uses the existing Student, Course, and Enrolment relationships rather than introducing additional domain classes.
+The duration parameter allows the session duration to be supplied when an attendance session is opened.
 
 ### UML / Code Deviations
 
 1. Added `NotEnrolledException`.
 2. Added `DuplicateAttendanceException`.
 3. Added `SessionClosedException`.
-4. Added `AttendanceSession(Course&, const TimeSlot&, int durationminute)`.
-5. Added `AttendanceSession::isOpen() const`.
-6. Added `AttendanceSession::getCourse() const`.
-7. Added `AttendanceSession::getTimeSlot() const`.
-8. Added `AttendanceSession::getDurationMinute() const`.
-9. Added `Course::getLecturer() const`.
-10. Added `Lecturer::addCourse(Course&)`.
-11. Added `Lecturer::activeSession` as a private `AttendanceSession*`.
-12. Changed `Lecturer::openAttendanceSession(const TimeSlot&)` to `openAttendanceSession(const TimeSlot&, int durationminute)`.
-13. Added `Lecturer::getActiveSession() const`.
+4. Added the parameterized AttendanceSession constructor.
+5. Added AttendanceSession accessors.
+6. Added `Course::getLecturer() const`.
+7. Added `Lecturer::addCourse(Course&)`.
+8. Added private `Lecturer::activeSession`.
+9. Changed `openAttendanceSession()` to accept a duration.
+10. Added `Lecturer::getActiveSession() const`.
 
-These changes do not introduce new domain classes or replace the existing UML relationships. They provide the additional implementation interface required to connect the Member 1 domain model with the Member 2 attendance workflow.
+These changes provide the implementation interface required to connect the Member 1 and Member 2 components.
 
-### AttendanceSession Integration
+---
 
-- Added a public interface to associate a `Course` with an `AttendanceSession`.
-- Added a public interface to associate a `TimeSlot` with an `AttendanceSession`.
-- Added a public interface to configure the session duration.
-- Added a public method to check whether the attendance session is currently open.
-- Added public accessors for the associated `Course` and `TimeSlot`.
+## Generic Repository
 
-### Reason
+### Changes
 
-The existing `AttendanceSession` stored the Course, TimeSlot, duration, and open state as private attributes. Member 1's Lecturer and attendance validation logic require controlled access to these values during integration.
-
-The new methods provide the minimum public interface required to configure and inspect an existing `AttendanceSession` without changing its overall architecture or internal data representation.
-
-### UML / Code Deviations
-
-1. Added `setcourse(Course*)` to configure the associated Course.
-2. Added `settimeslot(const TimeSlot&)` to configure the associated TimeSlot.
-3. Added `setduration(int)` to configure the session duration.
-4. Added `isopenstatus() const` to check the current session state.
-5. Added `getcourse() const` to access the associated Course.
-6. Added `gettimeslot() const` to access the associated TimeSlot.
-
-These additions are integration interfaces only. No existing UML attributes, relationships, or core session operations were removed or redesigned.
-
-## 2026-09-19
-
-### RotatingCodeCapture Integration
-
-- Updated `captureNext()` to validate the entered attendance code against the current active session code.
-- A matching code is returned to the caller.
-- An invalid code returns an empty string.
+- Implemented `Repository<T>` with a file-path constructor and `load()`, `save()`, `add()`, and `remove()` operations.
+- Used `vector<T>` internally for repository records.
+- Implemented temporary-file replacement and backup creation during saving.
+- Added directory handling and persistence-related exception handling.
+- Template definitions remain in `Repository.h`.
 
 ### Reason
 
-The UML defines `captureNext()` as the operation used to capture attendance input, but does not define a separate public code-validation operation.
-
-Validation was therefore implemented inside `captureNext()` to keep the existing UML interface unchanged while allowing the attendance system to distinguish valid and invalid attendance codes.
+The repository provides one reusable abstraction for text-file persistence while keeping file operations separate from the domain classes.
 
 ### UML / Code Deviations
 
-1. No new public validation method was added.
-2. `captureNext()` now validates the captured code against the private `currentCode`.
-3. Invalid input returns an empty string.
+1. The UML represents the repository using `list<T>`, while the implementation uses `vector<T>`.
+2. The repository is header-only because it is a template.
+3. Application integration uses `Repository<string>` line records rather than direct domain-object serialization.
+4. Backup and temporary-file handling are implementation details and are not represented as separate UML classes.
 
-The existing private `currentCode` attribute remains the previously approved implementation addition required to store the active attendance code.
+### Approved by
 
-## 2026-09-20
+Member 3 / Group integration decision.
 
-### AttendanceSession Lifetime Integration
+---
 
-- Updated `Lecturer` to retain closed `AttendanceSession` objects until the Lecturer is destroyed.
-- Added a private `sessionHistory : list<AttendanceSession*>` to `Lecturer`.
-- Changed `closeAttendanceSession()` so that it closes the session without immediately deleting it.
-- Changed replacement of an active session so that the previous session is retained before a new session is created.
-- Added cleanup of retained sessions in the `Lecturer` destructor.
+## Person Persistence and Application Connection
+
+### Changes
+
+- Added `Menu` and `Administrator` as friends of `Person`.
+- Added a non-owning `Menu* application`, initially `nullptr`.
+- Added `setApplication(Menu*)`.
+- Connected each user's role-specific interface to the application managing shared data and menus.
+
+### Reason
+
+The application needs controlled access to shared application state while keeping user data private.
+
+### UML / Code Deviations
+
+- Added friendship declarations.
+- Added the non-owning `Menu* application` relationship.
+- Added `setApplication(Menu*)`.
+- Existing user attributes remain private.
+
+### Approved by
+
+Member 3 / Group integration decision.
+
+---
+
+## Menu Application State and Integration Interface
+
+### Changes
+
+- Added owned user and course collections and an `AttendanceRegister` to `Menu`.
+- Added data path, current user and control flags.
+- Added role handlers, lookup functions, persistence helpers, demo setup and reference checks.
+
+### Reason
+
+The application needs one place to manage live objects, authentication, role menus, persistence and cross-component relationships.
+
+### UML / Code Deviations
+
+- `Menu` contains `vector<unique_ptr<Person>>` and `vector<unique_ptr<Course>>`.
+- `current` is a non-owning `Person*`.
+- `AttendanceRegister` is contained by value.
+- Expanded `Menu` beyond `run()` and `showloginmenu()` to support final application integration.
+- The original operations remain.
+
+### Approved by
+
+Member 3 / Group integration decision.
+
+---
+
+## Drop Status and Enrolment History
+
+### Changes
+
+- Added Student and Menu friendship to Enrolment.
+- `dropCourse()` marks an owned enrolment as `Dropped`.
+- Dropping removes its active course reference and updates the timetable.
+- `isEnrolled()` checks the student's owned enrolment records and requires the `Enrolled` status.
+- Dropping without an active enrolment throws the existing `NotEnrolledException`.
+
+### Reason
+
+The system must preserve enrolment history while distinguishing active enrolments from dropped or completed records.
+
+### UML / Code Deviations
+
+- Added friendship declarations.
+- Existing enrolment status and public operation signatures remain.
+- Historical enrolment records are retained rather than physically deleted.
+
+### Approved by
+
+Member 3 / Group integration decision.
+
+---
+
+## Prerequisite Integration Preparation
+
+### Changes
+
+- Implemented `Student::hasCompleted()` using the student's owned enrolment history and `Enrolment::isCompleted()`.
+- Added `Course::getPrerequisites() const`.
+
+### Reason
+
+This replaced the placeholder implementation that always returned false and allowed prerequisite validation to inspect the existing prerequisite list without copying or modifying it.
+
+### UML / Code Deviations
+
+- Added a read-only `Course::getPrerequisites() const` getter.
+- No new field, class or grading rule was introduced.
+
+### Approved by
+
+Member 3 / Group integration decision.
+
+---
+
+## Recursive Prerequisite Integration
+
+### Changes
+
+- Replaced the prerequisite TODO in `Student::enrollCourse()` with recursive validation.
+- Direct and indirect prerequisites are checked.
+- Missing prerequisite courses and detected prerequisite cycles are rejected.
+- Integration uses `Menu::findCourse()` and `Course::getPrerequisites()`.
+- Local sets track courses currently being checked and courses already checked.
+
+### Reason
+
+The enrolment workflow must enforce prerequisite chains rather than only checking direct prerequisites.
+
+### UML / Code Deviations
+
+- No additional class, persistent field, or public method was introduced.
+- Cycle detection is implemented using local tracking sets.
+
+### Approved by
+
+Member 3 / Group integration decision.
+
+---
+
+## AssessmentMarks Ownership
+
+### Changes
+
+- `Enrolment` stores `AssessmentMarks` through `unique_ptr`.
+- `setAssessmentMarks()` creates and owns the assessment-mark object.
+- Declared the Enrolment destructor in the header and defined it in the implementation file.
+
+### Reason
+
+Assessment marks belong to an individual enrolment and require clear ownership.
+
+Using `unique_ptr` provides RAII-based ownership and prevents references to destroyed temporary objects.
+
+### UML / Code Deviations
+
+- `Enrolment` explicitly owns its optional `AssessmentMarks`.
+- The implementation uses `unique_ptr<AssessmentMarks>`.
+- Assessment marks are not included in the final application persistence format.
+
+### Approved by
+
+Member 3 / Group integration decision.
+
+---
+
+## CorrectionRecord Lecturer Reference
+
+### Changes
+
+- `CorrectionRecord` stores a non-owning `Lecturer*` instead of a Lecturer value.
+- Its constructor and AttendanceRegister correction operations accept `Lecturer&`.
+- Deleted Lecturer copy constructor and copy assignment.
+
+### Reason
+
+Copying Lecturer would duplicate pointers to owned attendance sessions and could result in invalid ownership or double deletion.
+
+The correction record therefore refers to the existing acting Lecturer without owning or copying it.
+
+### UML / Code Deviations
+
+- Acting Lecturer is represented as a non-owning pointer in the implementation.
+- The relationship is therefore an association rather than ownership.
+- Lecturer copy operations are disabled to protect resource ownership.
+
+### Approved by
+
+Member 3 / Group integration decision.
+
+---
+
+## Capture Forwarding and Source Identification
+
+### Changes
+
+- Added abstract `AttendanceCapture::name() const` and implementations in both concrete capture classes.
+- Added `AttendanceSession::captureNext()` and `captureName() const`.
+- Input capture rejects closed or expired sessions and sessions without a capture mechanism.
+- AttendanceRegister records the actual capture source instead of fixed text.
+
+### Reason
+
+The UI needs to request attendance input through the session while keeping the session independent of concrete capture classes.
+
+Attendance records should identify whether attendance was captured using the rotating-code or file-replay mechanism.
+
+### UML / Code Deviations
+
+- Added `AttendanceCapture::name() const`.
+- Added `AttendanceSession::captureNext()`.
+- Added `AttendanceSession::captureName() const`.
+- Added corresponding concrete capture implementations.
+- No new domain class was introduced.
+
+### Approved by
+
+Member 3 / Group integration decision.
+
+---
+
+## Attendance-Session Eligibility Snapshot
+
+### Changes
+
+- Added `eligibleStudentIds` to AttendanceSession.
+- Added read-only `eligibleStudents()`.
+- Opening a session snapshots the unique IDs of currently enrolled students.
+- Move operations transfer the eligibility list with the session.
+- Added Menu persistence access for session state.
+- Explicitly deleted the copy constructor because the session owns its capture mechanism.
+- Opening requires a course and positive duration.
+- Capture initialization occurs before the session becomes open.
+
+### Reason
+
+Attendance percentages must account for students who were eligible when the session occurred, including students who never submitted attendance.
+
+The snapshot preserves historical attendance eligibility after enrolment changes.
+
+### UML / Code Deviations
+
+- Added `eligibleStudentIds`.
+- Added `eligibleStudents()`.
+- Added persistence friendship/access.
+- Added deleted copy construction.
+- These additions support attendance history and resource ownership.
+
+### Approved by
+
+Member 3 / Group integration decision.
+
+---
+
+## Attendance Reporting and Correction Integration
+
+### Changes
+
+- AttendanceRegister keeps non-owning session references and provides `registerSession()`.
+- Sessions with no attendance records can therefore participate in percentage calculations.
+- Percentages use the eligible roster stored at session opening.
+- Present and Late count as attended; Absent does not.
+- Added `correct()`, `effectiveStatus()`, and `showAudit()`.
+- CorrectionRecord stores `correctedStatus`.
+- Corrections append information with the acting Lecturer, reason, timestamp and corrected status while preserving original records.
+- Only the relevant course Lecturer may perform a correction.
+- A correction for an unrecorded eligible student first creates an immutable Absent baseline.
+- Added persistence access for attendance records, corrections and the register.
+
+### Reason
+
+To support attendance reporting while preserving immutable original attendance records and maintaining historical session eligibility.
+
+### UML / Code Deviations
+
+- Added session-reference collection to AttendanceRegister.
+- Added `registerSession()`.
+- Added `correct()`, `effectiveStatus()`, and `showAudit()`.
+- Added `correctedStatus` to CorrectionRecord.
+- Added Lecturer reference to CorrectionRecord.
+- Added persistence friendship/access.
+- These additions complete the attendance integration without introducing a separate attendance-reporting class.
+
+### Approved by
+
+Member 3 / Group integration decision.
+
+---
+
+# 2026-09-20 – Final Integration
+
+## Menu – Persistent Application Reconstruction
+
+### Changes
+
+- Implemented loading of users, courses, enrolments, attendance sessions, attendance records, and correction records at startup.
+- Relationships are reconstructed using saved identifiers so courses refer to the correct Lecturer, Enrolment objects refer to existing Student and Course objects, and attendance records refer to restored sessions.
+- Implemented system-level saving through `Menu::save()` using `Repository<string>` line records.
+- Added persistence helper operations to `Menu`.
+
+### Reason
+
+The final system must preserve users, courses, enrolments, attendance data, and relationships between program runs while keeping file I/O behind the repository abstraction.
+
+### UML / Code Deviations
+
+- `Menu` owns the live collections of users and courses and contains the application-level `AttendanceRegister`.
+- Expanded `Menu` with persistence and application-state operations.
+- Added application-level persistence helper operations.
+- Added persistence access required to reconstruct private domain state.
+- Application integration uses `Repository<string>` line records rather than direct domain-object serialization.
+
+### Approved by
+
+Group integration decision.
+
+---
+
+## User Persistence and Administrator CRUD
+
+### Changes
+
+- Added constructors that restore existing user IDs from files.
+- `Person::nextId` is advanced when persisted IDs are loaded to prevent duplicate future IDs.
+- Implemented Administrator create, update, and remove user operations with persistence and reference checks.
+- Added application and persistence access required to restore and update private user state.
+
+### Reason
+
+User accounts must survive restart and Administrator must support the required account-management operations.
+
+### UML / Code Deviations
+
+- Added persistence constructors accepting an existing ID.
+- Added application/persistence friendship to `Person`.
+- Added application-level access required for restoring private account fields and the ID counter.
+- These are implementation-level persistence additions and do not change the fundamental user inheritance hierarchy.
+
+### Approved by
+
+Group integration decision.
+
+---
+
+## Course Persistence and Administrator Course CRUD
+
+### Changes
+
+- Extended the course text format to persist course type, code, title, credits, capacity, lecturer ID, prerequisite codes, and one or more time slots.
+- Implemented Administrator create, edit, and remove course operations.
+- Added reference protection so courses with enrolment history or prerequisite references are not unsafely removed.
+- Editing a course preserves object relationships where possible.
+- Changing derived course type is rejected when existing enrolment history would make replacement unsafe.
+
+### Reason
+
+The final implementation requires complete course management and correct reconstruction of lecturer, prerequisite and timetable relationships.
+
+### UML / Code Deviations
+
+- Added persistence-specific helper access without changing the underlying domain ownership model.
+- Course persistence stores derived course type information so the correct concrete Course subclass can be reconstructed.
+- Persistence format includes course time-slot information that is reconstructed into the Course TimeSlot collection.
+- Administrator management operations are implemented at application level while the core Course hierarchy remains unchanged.
+
+### Approved by
+
+Group integration decision.
+
+---
+
+## Student Enrolment Integration
+
+### Changes
+
+- Connected Student menu operations to enrolment, drop, completion-check, and personal timetable functions.
+- Implemented recursive prerequisite-chain validation with cycle detection.
+- Timetable clash rejection uses the existing overloaded `TimeSlot::operator==`.
+- Enrolment and drop changes are saved immediately.
+- Dropped enrolments remain in the student's history while active-enrolment checks distinguish them from current enrolments.
+
+### Reason
+
+To complete the end-to-end Student workflow while keeping business rules in the domain classes rather than the menu driver.
+
+### UML / Code Deviations
+
+- The originally planned `enterAttendanceCode(string)` operation was not retained as a separate public method.
+- The Student role menu obtains the attendance code through the active `AttendanceSession` interface and passes it to the attendance core.
+- This preserves the responsibility without introducing a duplicate public wrapper.
+- Recursive prerequisite validation uses implementation-level tracking sets for cycle detection.
+- No additional domain class or persistent field was introduced.
+
+### Approved by
+
+Group integration decision.
+
+---
+
+## Lecturer Attendance Workflow and Runtime Capture Selection
+
+### Changes
+
+- Lecturer menu supports opening and closing attendance sessions, attendance reports, corrections, and correction-audit display.
+- Added an overload of `openAttendanceSession` that accepts an `AttendanceCapture*` selected at runtime.
+- Lecturer course-slot ownership is checked by exact slot fields rather than the overlap operator.
+- `TimeSlot::operator==` therefore remains dedicated to timetable clash detection.
+- Added `activeSession`, owned `sessionHistory`, and `getActiveSession()` to preserve session lifetimes used by attendance records.
+
+### Reason
+
+To support both mandatory attendance capture mechanisms safely and preserve attendance-session objects referenced by attendance records.
+
+### UML / Code Deviations
+
+- Added `sessionHistory : list<AttendanceSession*>`.
+- Added the capture-injection overload of `openAttendanceSession`.
+- Added `activeSession`.
+- Added `getActiveSession() const`.
+- Lecturer slot ownership validation uses explicit slot fields rather than `TimeSlot::operator==`.
+
+### Approved by
+
+Group integration decision.
+
+---
+
+## Attendance Core, Reporting, Corrections, and Persistence
+
+### Changes
+
+- `AttendanceRegister` tracks non-owning session references in addition to owned attendance records and correction records.
+- Session opening snapshots the IDs of students actively enrolled at that time.
+- Attendance validation rejects closed or expired sessions, non-enrolled students, and duplicate marks using distinct custom exceptions.
+- Per-student and per-course percentages use eligible-session snapshots.
+- Present and Late count as attended.
+- Corrections append a `CorrectionRecord` containing corrected status, acting Lecturer, reason, and timestamp.
+- Original `AttendanceRecord` objects are not edited or deleted.
+- Attendance sessions, attendance records, and correction records are saved and restored across program runs.
+- Expired sessions close their capture mechanism automatically.
+- A correction for an eligible student with no existing attendance record first creates an immutable Absent baseline.
+
+### Reason
+
+To provide the required attendance core and preserve accurate historical attendance information after enrolment changes or program restart.
+
+### UML / Code Deviations
+
+- `AttendanceSession` gained an eligibility snapshot of student IDs.
+- Added `eligibleStudents()` access.
+- `AttendanceRegister` gained a non-owning session-reference collection.
+- Added `registerSession()`.
+- Added correction/reporting integration operations including `correct()`, `effectiveStatus()`, and `showAudit()`.
+- `CorrectionRecord` gained `correctedStatus`.
+- `CorrectionRecord` stores a non-owning `Lecturer*` reference rather than copying a Lecturer object.
+- Added persistence friendship/access for attendance records, correction records and the register.
+- Attendance percentages use the eligibility snapshot rather than only counting stored attendance records.
+- Restored attendance sessions do not restore an active capture mechanism.
+
+### Approved by
+
+Group integration decision.
+
+---
+
+## FileReplayCapture and RotatingCodeCapture Final Integration
+
+### Changes
+
+- `FileReplayCapture` reads student IDs line-by-line.
+- Replay line numbers are tracked for malformed-event reporting.
+- `CorruptDataException` is thrown for malformed replay events.
+- `RotatingCodeCapture` generates and validates a short session attendance code.
+- Added `AttendanceCapture::name() const`.
+- Both concrete mechanisms are selected at runtime through the `AttendanceCapture` base interface.
+- Attendance records identify the capture mechanism used.
+
+### Reason
+
+To provide interchangeable attendance-capture strategies and support the required replay test containing both valid and malformed events.
+
+### UML / Code Deviations
+
+- Added `AttendanceCapture::name() const`.
+- Added corresponding `name()` implementations to `RotatingCodeCapture` and `FileReplayCapture`.
+- Added `AttendanceSession::captureNext()`.
+- Added `AttendanceSession::captureName() const`.
+- Added capture forwarding through the abstract interface.
+- `FileReplayCapture` contains implementation-specific `filePath`, `inputFile`, and `lineNumber` state.
+- `RotatingCodeCapture` contains private `currentCode` state.
+- These implementation details extend the UML representation without changing the core capture hierarchy.
+
+### Approved by
+
+Group integration decision.
+
+---
+
+## AttendanceSession Lifetime Integration
+
+### Changes
+
+- Updated Lecturer to retain closed `AttendanceSession` objects until the Lecturer is destroyed.
+- Added private `sessionHistory : list<AttendanceSession*>`.
+- Changed `closeAttendanceSession()` so that closing a session does not immediately delete the session object.
+- Retained previous sessions when replacing an active session.
+- Added cleanup of retained sessions in the Lecturer destructor.
 
 ### Reason
 
 `AttendanceRecord` stores a pointer to its associated `AttendanceSession`.
 
-Previously, `Lecturer::closeAttendanceSession()` immediately deleted the active session after closing it. This caused existing `AttendanceRecord` objects to contain dangling `AttendanceSession*` pointers.
+Immediately deleting a closed session would leave existing AttendanceRecord objects with dangling `AttendanceSession*` pointers.
 
-Closed sessions are therefore retained until the Lecturer is destroyed. This allows existing attendance records to continue referring to valid session objects while avoiding memory leaks.
+Closed sessions are therefore retained until the Lecturer is destroyed.
 
 ### UML / Code Deviations
 
-1. Added the private `sessionHistory : list<AttendanceSession*>` attribute to `Lecturer`.
+- Added private `sessionHistory : list<AttendanceSession*>`.
+- This represents an implementation-level ownership mechanism required to preserve the lifetime of sessions referenced by attendance records.
+- The existing AttendanceRecord-to-AttendanceSession relationship remains non-owning.
 
-This is a minimal implementation-level ownership addition required to preserve the lifetime of AttendanceSession objects referenced by AttendanceRecord. No existing UML methods, attributes, or relationships were removed or redesigned.
+### Approved by
 
-## 2026-09-20
+Group integration decision.
 
-### AttendanceRegister — Session Expiry Validation
+---
+
+## AttendanceRegister – Session Expiry Validation
+
+### Changes
 
 - Added an expiry check to `AttendanceRegister::markpresent()`.
-- Attendance is now rejected when the associated `AttendanceSession` has expired.
+- Attendance is rejected when the associated AttendanceSession has expired.
 - `SessionClosedException` is thrown when an expired session is used to mark attendance.
 
 ### Reason
 
-`AttendanceSession` already provides the UML-specified `isExpired()` operation.
+`AttendanceSession` provides `isExpired()` to determine whether the configured session duration has elapsed.
 
-The attendance register must not allow attendance to be marked after the attendance session has expired. The existing `isExpired()` operation is therefore used during `markpresent()` validation.
-
-No new UML class, attribute, or public method was introduced.
+The AttendanceRegister must prevent attendance from being recorded after expiry.
 
 ### UML / Code Deviations
 
-1. No UML deviation was introduced.
+- No new UML relationship or domain attribute was introduced.
+- The implementation uses the existing `AttendanceSession::isExpired()` operation.
 
-The implementation only uses the existing `AttendanceSession::isExpired()` operation to validate whether attendance can be recorded.
+### Approved by
 
+Group integration decision.
 
-Member 3
+---
 
-## AttendanceCapture — Virtual Destructor
+## Administrator User and Course Reference Protection
 
-### Change
-Added `virtual ~AttendanceCapture() = default`.
+### Changes
+
+- Administrator user deletion checks existing references before removing users.
+- Course deletion checks enrolment and prerequisite references before removal.
+- Course editing preserves existing relationships where possible.
 
 ### Reason
-The specification requires abstract interfaces to have virtual
-destructors. The design report states that AttendanceSession owns
-its AttendanceCapture instance.
 
-A virtual destructor allows the concrete capture object to be
-destroyed safely through an AttendanceCapture pointer.
+Persistent objects are referenced by other domain objects. Removing them without checking references could leave invalid relationships.
 
-### UML / Code Deviation
-The destructor was not shown in the UML. No existing operation,
-attribute, or relationship was removed or changed.
+### UML / Code Deviations
 
+- Reference-protection logic is implemented at application/integration level.
+- No additional domain class was introduced.
+- Existing pointer-based relationships remain unchanged.
 
-## Member 3 — FileReplayCapture implementation details
+### Approved by
 
-- Change: Added filePath, inputFile, lineNumber and a constructor
-  accepting the replay file path.
-- Reason: Read a selected file and identify malformed input lines.
-- UML deviation: Added private implementation fields and a constructor.
-  The three UML capture operations remain unchanged.
-- Approved by: Member 3.
+Group integration decision.
 
+---
 
-## Member 3 — File-operation exceptions
+## AssessmentMarks Ownership
 
-- Change: Added FileNotFoundException, CorruptDataException
-  and PersistenceException under the existing Exception base class.
-- Reason: Report file-opening, malformed-data and read/write failures
-  to the menu through exceptions.
-- Design alignment: The first two are specified in the report.
-  PersistenceException is an additional implementation exception.
-- Approved by: Member 3.
+### Changes
 
+- `Enrolment` stores `AssessmentMarks` through `unique_ptr`.
+- `setAssessmentMarks()` creates and owns the assessment-mark object.
+- The Enrolment destructor is explicitly declared and defined.
 
-## Member 3 — Generic repository
+### Reason
 
-- Change: Implemented Repository<T> with a file-path constructor
-  and load, save, add and remove operations.
-- Container decision: Used vector<T>, as allowed by Member 3.
-  The UML used list<T>; the report's interface table used vector<T>.
-- Reason: Provide one reusable interface for file storage.
-- Save behaviour: Write a temporary file and retain the previous
-  saved version as a backup.
-- Implementation detail: Template definitions remain in Repository.h.
-- Approved by: Member 3.
+Assessment marks belong to an individual enrolment and should have a clear ownership relationship.
 
-## Member 3 — Person persistence and application connection
+Using `unique_ptr` provides RAII-based ownership and prevents references to destroyed temporary objects.
 
-- Change: Added Menu and Administrator as friends of Person.
-- Reason: Allow the persistence layer to restore account fields
-  and the ID counter, and allow administrator account updates.
-- Change: Added a non-owning Menu* application, initially nullptr,
-  and setApplication(Menu*).
-- Reason: Connect each user's role-specific interface to the
-  application that manages shared data and menus.
-- UML deviation: Added friendship declarations, the application
-  reference and its setter. Existing fields remain private.
-- Approved by: Member 3.
+### UML / Code Deviations
 
+- `Enrolment` explicitly owns its optional `AssessmentMarks`.
+- The implementation uses `unique_ptr<AssessmentMarks>`.
+- Assessment marks are not included in the final application persistence format.
 
-## Member 3 — Menu application state and integration interface
+### Approved by
 
-- Change: Added owned user/course collections and an AttendanceRegister
-  to Menu, plus the data path, current user and control flags.
-- Reason: The application needs one place to manage live objects.
-- Ownership: Users and courses use vector<unique_ptr<...>>.
-  The current-user pointer is non-owning.
-- Change: Added role handlers, lookup functions, persistence helpers,
-  demo setup and reference checks.
-- Reason: Connect the existing domain classes to user interaction
-  and file storage while preserving object relationships.
-- UML deviation: Expanded Menu beyond run() and showloginmenu().
-  Both original operations remain.
-- Approved by: Member 3.
+Group integration decision.
 
+---
 
-## Member 3 — Drop status and enrolment history
+## CorrectionRecord Lecturer Reference
 
-- Change: Added Student and Menu friendship to Enrolment.
-- Reason: Allow controlled status updates and persistence access.
-- Change: dropCourse marks an owned enrolment as Dropped,
-  removes its active course reference and updates the timetable.
-- Change: isEnrolled checks the student's owned records and
-  requires the Enrolled status.
-- Reason: Retain history while distinguishing active enrolments.
-- Behaviour: Dropping without an active enrolment throws
-  the existing NotEnrolledException.
-- UML deviation: Added friendship declarations.
-  Existing enrolment status and public operation signatures remain.
-- Approved by: Member 3.
+### Changes
 
-## Member 3 — Prerequisite integration preparation
+- `CorrectionRecord` stores a non-owning `Lecturer*`.
+- Its constructor and AttendanceRegister correction operations accept `Lecturer&`.
+- Lecturer copy construction and copy assignment are disabled.
 
-- Change: Implemented Student::hasCompleted using the student's
-  owned enrolment history and Enrolment::isCompleted().
-- Reason: Replace the placeholder that always returned false.
-- Change: Added Course::getPrerequisites() const.
-- Reason: Allow recursive validation to read prerequisite codes
-  without modifying or copying the existing list.
-- UML deviation: Added a read-only getter.
-  No new field, class or grading rule was introduced.
-- Approved by: Member 3.
+### Reason
 
-## Member 3 — Recursive prerequisite integration
+Copying a Lecturer would duplicate pointers to owned attendance sessions and could result in invalid ownership or double deletion.
 
-- Change: Replaced the prerequisite TODO in Student::enrollCourse
-  with recursive validation.
-- Behaviour: Requires completion of direct and indirect prerequisites.
-  Rejects missing prerequisite courses and detected cycles.
-- Integration: Uses Menu::findCourse and the previously added
-  read-only Course::getPrerequisites getter.
-- Implementation: Local sets track courses being checked and
-  courses already checked.
-- UML deviation: No additional class, field or public method.
-- Approved by: Member 3.
+The correction record therefore refers to the existing acting Lecturer without owning or copying it.
 
-## Member 3 — AssessmentMarks ownership
+### UML / Code Deviations
 
-- Change: Enrolment now stores unique_ptr<AssessmentMarks>
-  instead of a non-owning AssessmentMarks pointer.
-- Change: setAssessmentMarks copies the supplied marks into
-  the owned object.
-- Reason: Prevent references to destroyed temporary marks and
-  retain assessment data for persistence.
-- Change: Declared the Enrolment destructor in the header and
-  defined it in the implementation file.
-- UML deviation: Enrolment explicitly owns its optional marks.
-- Approved by: Member 3.
+- Acting Lecturer is represented as a non-owning pointer in the implementation.
+- The UML relationship therefore represents an association rather than ownership.
+- Lecturer copy operations are disabled to protect resource ownership.
 
-## Member 3 — Correction lecturer reference
+### Approved by
 
-- Change: CorrectionRecord stores a non-owning Lecturer*
-  instead of a Lecturer value.
-- Change: Its constructor and AttendanceRegister::addcorrections
-  accept Lecturer&.
-- Reason: Copying Lecturer duplicates pointers to owned attendance
-  sessions and risks double deletion.
-- Change: Deleted Lecturer's copy constructor and copy assignment.
-- UML deviation: The acting lecturer is explicitly referenced,
-  rather than stored as an owned copy.
-- Approved by: Member 3.
+Group integration decision.
 
-## Member 3 — Capture forwarding and source identification
+---
 
-- Change: Added abstract AttendanceCapture::name() const
-  and implementations in both concrete capture classes.
-- Reason: Identify the actual capture source in attendance records.
-- Change: Added AttendanceSession::captureNext() and
-  captureName() const.
-- Reason: Let the UI request input through the session while
-  keeping the session independent of concrete capture classes.
-- Behaviour: Input capture rejects closed or expired sessions
-  and sessions without a capture method.
-- Change: AttendanceRegister records session.captureName()
-  instead of the fixed text "AttendanceRegister".
-- UML deviation: Added the above operations; no new fields or classes.
-- Approved by: Member 3.
+## Attendance Capture Source Identification
 
-## Member 3 — Attendance-session eligibility snapshot
+### Changes
 
-- Change: Added eligibleStudentIds to AttendanceSession and
-  the read-only eligibleStudents() accessor.
-- Reason: Preserve who was enrolled when each session opened,
-  including students who never submitted attendance.
-- Behaviour: open() snapshots unique enrolled student IDs.
-  Move operations transfer this list with the session.
-- Change: Added Menu friendship for saving and restoring session state.
-- Change: Explicitly deleted the copy constructor to document
-  exclusive capture ownership.
-- Validation: Opening requires a course and positive duration;
-  capture initialization occurs before the session becomes open.
-- UML deviation: Added the eligibility list, accessor and
-  persistence friendship.
-- Approved by: Member 3.
+- Added abstract `AttendanceCapture::name() const`.
+- Implemented the operation in both concrete capture classes.
+- AttendanceSession forwards capture-source information.
+- AttendanceRegister records the active capture mechanism rather than using a fixed source label.
 
-## Member 3 — Attendance reporting and correction integration
+### Reason
 
-- Change: AttendanceRegister keeps non-owning session references
-  and provides registerSession().
-- Reason: Count sessions with no attendance records.
-- Change: Percentages use the eligible roster stored at session opening.
-  Present and Late count as attended; Absent does not.
-- Change: CorrectionRecord stores correctedStatus.
-- Change: Added correct(), effectiveStatus() and showAudit().
-- Reason: Append corrections with the acting lecturer, reason,
-  timestamp and corrected status while preserving original records.
-- Behaviour: Only the course lecturer may correct attendance.
-  A correction for an unrecorded eligible student first creates
-  an immutable Absent baseline.
-- Change: Added Menu friendship to attendance records, corrections
-  and the register for persistence.
-- UML deviation: Added the session-reference collection,
-  correctedStatus, integration operations and persistence friendship.
-- Approved by: Member 3.
+Attendance records should identify whether attendance was captured using the rotating-code or file-replay mechanism.
+
+### UML / Code Deviations
+
+- Added `name()` to the abstract capture interface.
+- Added corresponding concrete implementations.
+- Added `captureName()` to AttendanceSession.
+- Added capture-source forwarding without introducing a new domain class or attribute.
+
+### Approved by
+
+Group integration decision.
+
+---
+
+## Attendance-Session Eligibility Snapshot
+
+### Changes
+
+- Added `eligibleStudentIds` to AttendanceSession.
+- Added read-only `eligibleStudents()` access.
+- Opening a session snapshots the unique IDs of currently enrolled students.
+- Move operations transfer the eligibility list with the session.
+- Added Menu persistence access for session state.
+- Added explicit deleted copy construction to document exclusive capture ownership.
+- Validation requires a course and positive duration before opening.
+
+### Reason
+
+Attendance percentages must account for students who were eligible when the session occurred, including students who never submitted attendance.
+
+The snapshot also preserves historical attendance eligibility after enrolment changes.
+
+### UML / Code Deviations
+
+- Added `eligibleStudentIds`.
+- Added `eligibleStudents()`.
+- Added persistence friendship/access.
+- Added explicit deleted copy construction.
+- These additions support attendance history and resource ownership without introducing a new class.
+
+### Approved by
+
+Group integration decision.
+
+---
+
+## Attendance Reporting and Correction Integration
+
+### Changes
+
+- AttendanceRegister maintains non-owning references to attendance sessions.
+- Added `registerSession()` so sessions with no attendance records participate in percentage calculations.
+- Attendance percentages use the eligible roster captured at session opening.
+- Present and Late count as attended.
+- Added `correct()`, `effectiveStatus()`, and `showAudit()`.
+- Corrections preserve the original AttendanceRecord and append a CorrectionRecord.
+- Only the relevant course Lecturer may perform a correction.
+- A correction for an eligible student without an existing record creates an immutable Absent baseline.
+- Attendance records, correction records, and session references are available to the persistence layer.
+
+### Reason
+
+To support attendance reporting while preserving immutable original attendance records and maintaining historical session eligibility.
+
+### UML / Code Deviations
+
+- Added session-reference collection to AttendanceRegister.
+- Added `registerSession()`.
+- Added `correct()`, `effectiveStatus()`, and `showAudit()`.
+- Added `correctedStatus` to CorrectionRecord.
+- Added Lecturer reference to CorrectionRecord.
+- Added persistence access for attendance objects.
+- These are implementation-level additions required to complete the attendance workflow.
+
+### Approved by
+
+Group integration decision.
+
+---
+
+## User Persistence and Administrator CRUD
+
+### Changes
+
+- Added constructors that restore existing user IDs from files.
+- `Person::nextId` is advanced when persisted IDs are loaded to prevent duplicate future IDs.
+- Implemented Administrator create, update, and remove user operations with persistence and reference checks.
+
+### Reason
+
+User accounts must survive restart and Administrator must support the required account-management operations.
+
+### UML / Code Deviations
+
+- Added persistence constructors taking an existing ID.
+- Added application/persistence friendship required to restore private state.
+- Added application-level access required for restoring private account fields and the ID counter.
+
+### Approved by
+
+Group integration decision.
+
+---
+
+## Course Persistence and Administrator Course CRUD
+
+### Changes
+
+- Extended the course text format to persist course type, code, title, credits, capacity, lecturer ID, prerequisite codes, and one or more time slots.
+- Implemented Administrator create, edit, and remove course operations.
+- Added reference protection so courses with enrolment history or prerequisite references are not unsafely removed.
+- Editing a course preserves object relationships where possible.
+- Changing derived course type is rejected when existing enrolment history would make replacement unsafe.
+
+### Reason
+
+The final implementation requires complete course management and correct reconstruction of lecturer, prerequisite and timetable relationships.
+
+### UML / Code Deviations
+
+- Added persistence-specific helper access without changing the domain ownership model.
+- Persistence stores derived course type information so the correct concrete Course subclass can be reconstructed.
+- Persistence format includes course time-slot information.
+- Administrator management is implemented at application level while the core Course hierarchy remains unchanged.
+
+### Approved by
+
+Group integration decision.
+
+---
+
+## Final Capacity and Expiry Corrections
+
+### Changes
+
+- `Course::isFull()` now counts active enrolments rather than completed historical enrolments.
+- `AttendanceSession::isExpired()` closes the session when its configured duration has elapsed.
+- Expiry causes attendance capture to stop accepting attendance.
+
+### Reason
+
+Completed students should not consume current course capacity, and session expiry must have the same closed-state effect as manual closure.
+
+### UML / Code Deviations
+
+- No new UML class or relationship was introduced.
+- These are behavioural corrections to existing domain operations.
+
+### Approved by
+
+Group integration decision.
+
+---
+
+# Final Verification
+
+The final integrated implementation was verified through targeted manual testing covering:
+
+- attendance attempted without an open session;
+- invalid rotating attendance code;
+- valid and malformed FileReplayCapture events;
+- non-enrolled attendance rejection;
+- duplicate attendance rejection;
+- timetable clash detection;
+- session opening and runtime capture selection.
+
+The final project was also built and launched using the configured C++17 CMake build.
+
+No automated test suite is included in the repository.
