@@ -14,6 +14,13 @@ void AttendanceRegister::markpresent(Student& student,
         );
     }
 
+if (session.isExpired())
+{
+    throw SessionClosedException(
+        "Cannot mark attendance: session has expired."
+    );
+}
+
     Course* course = session.getCourse();
 
     if (course == nullptr)

@@ -360,6 +360,8 @@ catch (const SessionClosedException& e)
     cout << "SessionClosedException caught: "
          << e.what() << endl;
 }
+
+}
 return 0;
 
 
