@@ -763,3 +763,25 @@ Closed sessions are therefore retained until the Lecturer is destroyed. This all
 1. Added the private `sessionHistory : list<AttendanceSession*>` attribute to `Lecturer`.
 
 This is a minimal implementation-level ownership addition required to preserve the lifetime of AttendanceSession objects referenced by AttendanceRecord. No existing UML methods, attributes, or relationships were removed or redesigned.
+
+## 2026-09-20
+
+### AttendanceRegister — Session Expiry Validation
+
+- Added an expiry check to `AttendanceRegister::markpresent()`.
+- Attendance is now rejected when the associated `AttendanceSession` has expired.
+- `SessionClosedException` is thrown when an expired session is used to mark attendance.
+
+### Reason
+
+`AttendanceSession` already provides the UML-specified `isExpired()` operation.
+
+The attendance register must not allow attendance to be marked after the attendance session has expired. The existing `isExpired()` operation is therefore used during `markpresent()` validation.
+
+No new UML class, attribute, or public method was introduced.
+
+### UML / Code Deviations
+
+1. No UML deviation was introduced.
+
+The implementation only uses the existing `AttendanceSession::isExpired()` operation to validate whether attendance can be recorded.
