@@ -73,6 +73,7 @@ bool AttendanceSession::isExpired()
     return difftime(currentTime, opentime)
            >= durationminute * 60;
 }
+
 bool AttendanceSession::isOpen() const
 {
     return isopen;
@@ -88,44 +89,9 @@ const TimeSlot& AttendanceSession::getTimeSlot() const
     return timeslot;
 }
 
-int AttendanceSession::getDurationMinute() const
-{
-    return durationminute;
-}
-
 void AttendanceSession::setcapturemethod(AttendanceCapture* c)
 {
     capture = c;
-}
-
-void AttendanceSession::setcourse(Course* course)
-{
-    this->course = course;
-}
-
-void AttendanceSession::settimeslot(const TimeSlot& timeslot)
-{
-    this->timeslot = timeslot;
-}
-
-void AttendanceSession::setduration(int durationminute)
-{
-    this->durationminute = durationminute;
-}
-
-bool AttendanceSession::isopenstatus() const
-{
-    return isopen;
-}
-
-Course* AttendanceSession::getcourse() const
-{
-    return course;
-}
-
-const TimeSlot& AttendanceSession::gettimeslot() const
-{
-    return timeslot;
 }
 
 AttendanceSession::AttendanceSession(AttendanceSession&& other)

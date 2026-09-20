@@ -37,18 +37,7 @@ public:
     Course* getCourse() const;
     const TimeSlot& getTimeSlot() const;
 
-    int getDurationMinute() const;
-
     void setcapturemethod(AttendanceCapture* c);
-
-    void setcourse(Course* course);
-    void settimeslot(const TimeSlot& timeslot);
-    void setduration(int durationminute);
-
-    bool isopenstatus() const;
-
-    Course* getcourse() const;
-    const TimeSlot& gettimeslot() const;
 
     AttendanceSession& operator=(const AttendanceSession&) = delete;
 
