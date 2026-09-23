@@ -1,2 +1,0 @@
-"Student One"
-"Administrator One"

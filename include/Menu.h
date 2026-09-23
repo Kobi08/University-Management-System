@@ -36,7 +36,7 @@ private:
     Person* current = nullptr;
 
     bool stop = false;
-    bool dirty = false;
+   
 
     // Input helpers.
     static std::string ask(const std::string& prompt);
@@ -45,21 +45,14 @@ private:
                       int low,
                       int high);
 
-    // Save after a successful change.
-    void saveAction();
+  
 
     // Display available data.
     void listCourses() const;
     void listUsers() const;
 
-    // Convert between application objects and saved text rows.
-    std::vector<std::string> rows() const;
 
-    void loadRows(const std::vector<std::string>& savedRows);
-
-    // Application-state helpers.
-    void clear();
-    void rebuildLecturerCourses();
+    
 
 public:
     explicit Menu(
@@ -78,7 +71,7 @@ public:
     Course* findCourse(const std::string& code) const;
 
     void save() const;
-    void load();
+    
 
     void createDemo();
 

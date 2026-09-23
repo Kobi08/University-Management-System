@@ -51,9 +51,7 @@ void Enrolment::setAssessmentMarks(AssessmentMarks& marks)
 }
 void Enrolment::calculateGrade()
 {
-    // TODO: Replace the temporary standard exception with
-    // the final custom exception hierarchy once it is created.
-
+   
     if (assessmentMarks == nullptr)
     {
         throw invalid_argument(

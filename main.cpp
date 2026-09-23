@@ -1,31 +1,23 @@
+#include <exception>
 #include <iostream>
-#include <list>
 
-#include "Student.h"
-#include "Lecturer.h"
-#include "Administrator.h"
-#include "LectureCourse.h"
-#include "LabCourse.h"
-#include "ProjectCourse.h"
-#include "AssessmentMarks.h"
-#include "Enrolment.h"
-#include "Exceptions.h"
-#include "AttendanceRegister.h"
-#include "FileReplayCapture.h"
-#include "Repository.h"
 #include "Menu.h"
-#include <string>
-#include <vector>
-
-
-using namespace std;
 
 int main()
 {
- Menu app;
-    app.run();
+    try
+    {
+        Menu app;
+        app.run();
+    }
+    catch (const std::exception& error)
+    {
+        std::cerr << "Fatal error: "
+                  << error.what()
+                  << '\n';
 
-   
-return 0;
-  
+        return 1;
+    }
+
+    return 0;
 }
