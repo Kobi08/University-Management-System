@@ -12,6 +12,11 @@ This document records design and implementation changes made after the approved 
 
 ### Changes
 
+# 2026-09-18
+
+## Person
+
+### Changes
 - Made the `Person` constructor `protected`.
 - Added `const` qualifiers to read-only functions such as `login()`, `getName()`, and `getId()`.
 - Added a `virtual` destructor.
@@ -19,14 +24,12 @@ This document records design and implementation changes made after the approved 
 - Implemented automatic ID generation using the `U001`, `U002`, `U003`, ... format.
 
 ### Reason
-
 - The protected constructor prevents direct construction of the abstract `Person` class.
 - `const` functions prevent read-only operations from modifying the object.
 - The virtual destructor supports safe destruction of derived objects through a `Person` pointer.
 - `generateId()` keeps ID-generation logic inside the `Person` class.
 
 ### UML / Code Deviations
-
 1. `Person` constructor visibility changed to `protected`.
 2. `const` qualifiers were added to read-only functions.
 3. A virtual destructor was added.
@@ -39,6 +42,7 @@ This document records design and implementation changes made after the approved 
 
 ### Changes
 
+### Changes
 - Changed `enrollCourse(Course c)` to `enrollCourse(Course& course)`.
 - Changed `dropCourse(Course c)` to `dropCourse(Course& course)`.
 - Changed `isEnrolled(Course c)` to `isEnrolled(const Course& course) const`.
@@ -59,17 +63,20 @@ The virtual default destructor explicitly overrides the virtual destructor inher
 
 ### Changes
 
+### Changes
 - Changed `viewEnrolment(Course)` to `viewEnrolment(Course& course) const`.
 - Changed `openAttendanceSession(TimeSlot)` to `openAttendanceSession(const TimeSlot& slot)`.
 - Added `~Lecturer() override = default`.
 
 ### Reason
-
 References avoid unnecessary copying of domain objects, while `const` ensures that read-only operations do not modify the Lecturer.
 
 The virtual destructor supports safe destruction of Lecturer objects through the polymorphic `Person` base class.
 
 ### UML / Code Deviations
+1. `viewEnrolment()` uses `Course&` and `const` instead of passing `Course` by value.
+2. `openAttendanceSession()` uses `const TimeSlot&` instead of passing `TimeSlot` by value.
+3. A virtual destructor override was added.
 
 1. `viewEnrolment()` uses `Course&` and `const` instead of passing `Course` by value.
 2. `openAttendanceSession()` uses `const TimeSlot&` instead of passing `TimeSlot` by value.
@@ -81,6 +88,7 @@ The virtual destructor supports safe destruction of Lecturer objects through the
 
 ### Changes
 
+### Changes
 - Changed `createCourse()` and `editCourse()` lecturer parameters from `Lecturer` to `Lecturer&`.
 - Added `const` references for string and prerequisite-list parameters.
 - Changed `removeUser()` to return `bool`.
@@ -88,6 +96,7 @@ The virtual destructor supports safe destruction of Lecturer objects through the
 - Added `~Administrator() override = default`.
 
 ### Reason
+References avoid unnecessary copying of existing Lecturer objects. `const` references avoid unnecessary copying while preventing modification of supplied arguments.
 
 References avoid unnecessary copying of existing Lecturer objects. `const` references avoid unnecessary copying while preventing modification of supplied arguments.
 
@@ -297,6 +306,7 @@ Constructors and getters are required to create and access TimeSlot data.
 - Implemented timetable display and course clash detection using Course TimeSlots.
 
 ### Reason
+Pointers allow Enrolment to refer to existing Student and Course objects instead of creating copies.
 
 `Course` is abstract and therefore cannot be stored by value in the timetable.
 
@@ -370,6 +380,7 @@ The virtual destructor allows concrete capture implementations to be safely dest
 - Updated `captureNext()` to validate the entered attendance code against the current active session code.
 
 ### Reason
+The project requires a custom exception hierarchy for domain-level rule violations.
 
 `currentCode` stores the currently generated attendance code during an active session.
 
@@ -425,6 +436,7 @@ Friend access allows AttendanceRegister to use the required private information 
 - Added a constructor.
 
 ### Reason
+`operator==` is used for equality and timetable clash detection, so a boolean return value is required.
 
 `time_t` is used as the C++ representation of a time value.
 
@@ -524,6 +536,7 @@ These exceptions extend the existing `Exception` base class and provide the requ
 - Connected AttendanceRegister with the existing Enrolment interface.
 
 ### Reason
+`Course` is abstract and therefore cannot be stored by value in the timetable.
 
 These changes connect the Member 1 domain model with the Member 2 attendance implementation.
 
@@ -561,6 +574,7 @@ These changes provide the implementation interface required to connect the Membe
 - Template definitions remain in `Repository.h`.
 
 ### Reason
+Course is abstract and cannot be stored directly as an object, so a pointer is used to refer to the associated Course.
 
 The repository provides one reusable abstraction for text-file persistence while keeping file operations separate from the domain classes.
 
@@ -640,6 +654,7 @@ Member 3 / Group integration decision.
 - Dropping without an active enrolment throws the existing `NotEnrolledException`.
 
 ### Reason
+`currentCode` stores the currently generated attendance code during an active session.
 
 The system must preserve enrolment history while distinguishing active enrolments from dropped or completed records.
 
@@ -711,6 +726,7 @@ Member 3 / Group integration decision.
 - Declared the Enrolment destructor in the header and defined it in the implementation file.
 
 ### Reason
+`time_t` provides a usable C++ representation for time values.
 
 Assessment marks belong to an individual enrolment and require clear ownership.
 
@@ -764,6 +780,7 @@ Member 3 / Group integration decision.
 - AttendanceRegister records the actual capture source instead of fixed text.
 
 ### Reason
+`time_t` is used as the C++ representation of a time value.
 
 The UI needs to request attendance input through the session while keeping the session independent of concrete capture classes.
 
@@ -832,6 +849,7 @@ Member 3 / Group integration decision.
 - Added persistence access for attendance records, corrections and the register.
 
 ### Reason
+The collections match the UML relationships.
 
 To support attendance reporting while preserving immutable original attendance records and maintaining historical session eligibility.
 
@@ -894,6 +912,7 @@ Group integration decision.
 User accounts must survive restart and Administrator must support the required account-management operations.
 
 ### UML / Code Deviations
+- No UML class, attribute, relationship, or domain method was changed.
 
 - Added persistence constructors accepting an existing ID.
 - Added application/persistence friendship to `Person`.
@@ -1040,6 +1059,7 @@ Group integration decision.
 - Attendance records identify the capture mechanism used.
 
 ### Reason
+These changes connect the Member 1 domain model with the Member 2 attendance implementation.
 
 To provide interchangeable attendance-capture strategies and support the required replay test containing both valid and malformed events.
 
@@ -1205,6 +1225,7 @@ Group integration decision.
 Attendance records should identify whether attendance was captured using the rotating-code or file-replay mechanism.
 
 ### UML / Code Deviations
+1. Added private `sessionHistory : list<AttendanceSession*>`.
 
 - Added `name()` to the abstract capture interface.
 - Added corresponding concrete implementations.
@@ -1264,6 +1285,7 @@ Group integration decision.
 - Attendance records, correction records, and session references are available to the persistence layer.
 
 ### Reason
+`AttendanceSession` already provides the `isExpired()` operation.
 
 To support attendance reporting while preserving immutable original attendance records and maintaining historical session eligibility.
 
@@ -1295,7 +1317,7 @@ Group integration decision.
 
 User accounts must survive restart and Administrator must support the required account-management operations.
 
-### UML / Code Deviations
+---
 
 - Added persistence constructors taking an existing ID.
 - Added application/persistence friendship required to restore private state.
